@@ -17,3 +17,22 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(wrta)
 ```
+
+# Summary
+
+This project written by Garren Kalter and Luke Watson-Sharer attempts to showcase the inefficiencies of the Worcester Regional Transit Authority. In doing so, we hope to use our geospatial and coding skill sets in order to display potential improvements to the WRTA. While this package will continue to be built well into the Spring of 2021, for the purposes of Geography 346 we will display various deliverables with an end goal of highlighting the ideal high frequency transit lines within the city. In creating a high frequency transit network in Worcester we hope to have a proof of concept that can be applied to more complex models as Garren progresses on his thesis. 
+
+
+# Approach and Methods
+
+## Data
+
+The data used in this report come from a variety of locations. Data sources of note include the Worcester Regional Transit Authority website, and the census. It should be known that data from the WRTA website has been manipulated and preprocessed in order to be readible for the R program. For example, there is a route profile that displays ridership data and other pertinent information on a route by route basis. This would not be useable in an R file without the appropriate information being placed in a table.
+
+## Code
+At this point in time, we do not have any deliverables which will require a package outside of those we have already been exposed to in Geog346. Packages which will be used include: devtools, geospaar, dplyr, ggplot,roxgen2, sp, sf, tibble, and tidyverse among others. If the opportunity presents itself we would like to have a deliverable which uses the zoo package or another package which can be used to complete optimization modeling. However, this likely will not be done until the winter.
+
+
+## Timeline
+Due to the various hurdles that come with the end of the semester as well as the abrupt transition last week little progress has been made at this point in time. However, by the end of the day today, Wednesday the 25th the following objectives should be achieved: finish configuring the WRTA package, first draft of the Overview pushed, the skeleton of our presentation being pushed, read in of various key files, and the launch of preliminary maps. Amendments for future components of our timeline will be pushed likely by this evening. 
+
