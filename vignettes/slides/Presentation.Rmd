@@ -1,7 +1,7 @@
 ---
-title: "Untitled"
-author: "Garren Kalter"
-date: "11/25/2020"
+title: "Visions of a Better WRTA"
+author: "Garren Kalter and Luke Watson Sharer"
+date: "12/4/2020"
 output:
   ioslides_presentation: default
   slidy_presentation: default
@@ -10,6 +10,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
+
 
 ## Class 15 notes
 ### Negative selection
