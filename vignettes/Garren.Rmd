@@ -14,6 +14,57 @@ knitr::opts_chunk$set(
 )
 ```
 
+
+#Libraries Used
 ```{r setup}
 library(wrta)
+library(sf)
+library(dplyr)
 ```
+
+# Reading in Files
+```{r}
+stops <- ("/Users/garrenkalter/Desktop/wrta/Read_In/WRTA\ August\ 2020/Active_WRTA_Bus_Stops_Aug2020.shp" ) %>% st_read() 
+
+routes <- ("/Users/garrenkalter/Desktop/wrta/Read_In/WRTA\ August\ 2020/Active_WRTA_Routes_Aug2020.shp") %>% st_read() %>% st_zm() %>% plot()
+
+ridership <- ("/Users/garrenkalter/Desktop/wrta/Read_In/Weekday_ridership.xlsx") %>% st_read()
+
+roads <- ("/Users/garrenkalter/Desktop/wrta/Read_In/tl_2018_25027_roads/tl_2018_25027_roads.shp") %>% st_read() %>% plot()
+
+worcester_ct <- ("/Users/garrenkalter/Desktop/wrta/Read_In/tl_2017_25027_faces/tl_2017_25027_faces.shp") %>% st_read() %>% plot()
+
+```
+
+# Join
+```{r}
+#Identifying whether variables Match
+routes$Bus_Route %in% ridership$ROUTE
+
+#completing a join via coercion
+full_join(as_tibble(ridership), routes, by = c("ROUTE" = "BusRoute"))
+
+```
+
+
+# Map Categorizing Routes
+```{r}
+ # category map
+
+ridership %>% 
+   mutate(WKDAY_RIDERS = ifelse(yield > , "high", "other"), 
+          yld_cat = ifelse(between(yield, 3.5, 4.5), "medium", yld_cat),
+        yld_cat = ifelse(yield < 3.5, "low", yld_cat)) %>% 
+    ggplot() + geom_sf(aes(fill = yld_cat))
+```
+
+# Map Showcasing Routes above Maximum Allowable Subsidy
+
+```{r}
+> districts2 %>% 
++   mutate(yld_cat = ifelse(yield > , "high", "other"), 
++          yld_cat = ifelse(between(yield, 3.5, 4.5), "medium", yld_cat),
++          yld_cat = ifelse(yield < 3.5, "low", yld_cat)) %>% 
++   ggplot() + geom_sf(aes(fill = yld_cat))
+```
+
