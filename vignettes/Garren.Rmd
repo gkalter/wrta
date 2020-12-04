@@ -20,24 +20,24 @@ knitr::opts_chunk$set(
 library(wrta)
 library(sf)
 library(dplyr)
+library(rgdal)
 ```
 
-# Reading in Files
-```{r}
-stops <- ("/Users/garrenkalter/Desktop/wrta/Read_In/WRTA\ August\ 2020/Active_WRTA_Bus_Stops_Aug2020.shp" ) %>% st_read() 
 
-routes <- ("/Users/garrenkalter/Desktop/wrta/Read_In/WRTA\ August\ 2020/Active_WRTA_Routes_Aug2020.shp") %>% st_read() %>% st_zm() %>% plot()
+```{r, eval = FALSE}
+ridership <- system.file("extdata/Weekday_ridership.xlsx", package = "wrta") %>% 
+  st_read() 
+stops <- system.file("extdata/county.shp", package = "wrta") %>% st_read()
+```
 
-ridership <- ("/Users/garrenkalter/Desktop/wrta/Read_In/Weekday_ridership.xlsx") %>% st_read()
+#Locally Stored Version
+```{r,eval = FALSE}
 
-roads <- ("/Users/garrenkalter/Desktop/wrta/Read_In/tl_2018_25027_roads/tl_2018_25027_roads.shp") %>% st_read() %>% plot()
-
-worcester_ct <- ("/Users/garrenkalter/Desktop/wrta/Read_In/tl_2017_25027_faces/tl_2017_25027_faces.shp") %>% st_read() %>% plot()
 
 ```
 
 # Join
-```{r}
+```{r, eval = FALSE}
 #Identifying whether variables Match
 routes$Bus_Route %in% ridership$ROUTE
 
@@ -48,21 +48,22 @@ full_join(as_tibble(ridership), routes, by = c("ROUTE" = "BusRoute"))
 
 
 # Map Categorizing Routes
-```{r}
+```{r, eval = FALSE}
  # category map
 
 ridership %>% 
-   mutate(WKDAY_RIDERS = ifelse(yield > , "high", "other"), 
-          yld_cat = ifelse(between(yield, 3.5, 4.5), "medium", yld_cat),
-        yld_cat = ifelse(yield < 3.5, "low", yld_cat)) %>% 
+  mutate(WKDAY_RIDERS_cat = ifelse(WKDAY_RIDERS > 100000, "high", WKDAY_RIDERS_cat),  
+          WKDAY_RIDERS_cat = ifelse(between(WKDAY_RIDERS, 10000, 99999), "medium", WKDAY_RIDERS_cat),
+        WKDAY_RIDERS_cat = ifelse(WKDAY_RIDERS < 10000, "low", WKDAY_RIDERS_cat),
+        WKDAY_RIDERS_cat = ifelse(WKDAY_RIDERS, "No Route", WKDAY_RIDERS_cat)) %>% 
     ggplot() + geom_sf(aes(fill = yld_cat))
 ```
 
 # Map Showcasing Routes above Maximum Allowable Subsidy
 
-```{r}
+```{r, eval = FALSE}
 > districts2 %>% 
-+   mutate(yld_cat = ifelse(yield > , "high", "other"), 
++   mutate(yld_cat = ifelse(yield > , "high", "other") , 
 +          yld_cat = ifelse(between(yield, 3.5, 4.5), "medium", yld_cat),
 +          yld_cat = ifelse(yield < 3.5, "low", yld_cat)) %>% 
 +   ggplot() + geom_sf(aes(fill = yld_cat))

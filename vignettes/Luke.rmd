@@ -1,0 +1,117 @@
+---
+title: "Luke"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Luke}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+# Luke Watson-Sharer
+# Population Density and Traffic Count Map
+# Final Project Geog 246, with Garren
+```{r, eval = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+```
+
+```{r setup}
+# Packages
+
+library(wrta)
+library(dplyr)
+library(ggplot2)
+library(rgdal)
+library(raster)
+library(sf)
+```
+
+```{r, eval = FALSE}
+# Read in files
+# username fix
+ridership <- system.file("extdata/Weekday_ridership.xlsx", package = "wrta") %>% 
+  st_read() 
+county <- system.file("extdata/tl_2017_25027_faces/tl_2017_25027_faces.shp",
+                     package = "wrta") %>% st_read()
+roads <- system.file("extdata/tl_2018_25027_roads/tl_2018_25027_roads.shp",
+                     package = "wrta") %>% st_read()
+stops <- system.file("extdata/WRTA_August_2020/Active_WRTA_Bus_Stops_Aug2020.shp",
+                     package = "wrta") %>% st_read()
+routes <- system.file("extdata/WRTA_August_2020/Active_WRTA_Routes_Aug2020.shp",
+                      package = "wrta") %>% st_read()
+censusTractPolygon <- system.file("extdata/tl_2018_25027_roads/tl_2018_25027_roads.shp",
+                     package = "wrta") %>% st_read()
+polygonCensusTract<- system.file("extdata/Census/export-gisdata.mapc.census2010_tracts_poly.shp",
+                     package = "wrta") %>% st_read()
+vehicle <- system.file("extdata/tabular.trans_mavc_public_summary_ct_2014_q4.csv", package = "wrta") %>% readr::read_csv(.)
+censusTractPop <- system.file("extdata/tabular.demo_general_demographics_ct_2010.csv", package = "wrta") %>% readr::read_csv(.)
+```
+
+```{r, eval = FALSE}
+# summary statistics and joins for setup
+censusTractDf <- left_join(censusTractPop, vehicle, by = "ct10_id") #joining data frames
+df2 <- polygonCensusTract %>%  
+    mutate(ct10_id = as.numeric(ct10_id)) # convery type to numeric
+censusTractDf1 <- left_join(df2, censusTractDf, by = "ct10_id") #joining new dataset
+popDensityTable<- censusTractDf1[ , c("pop", "area_acres", "ct10_id" )] %>% st_set_geometry(NULL)
+popDensityTable
+lapply(popDensityTable[ ,c(1:2)], as.numeric)
+DensityOverSpaceMA <- lapply(popDensityTable, function(x) as.numeric(as.character(x)))
+DensityOverSpaceMA$newColumn <- (DensityOverSpaceMA$pop / DensityOverSpaceMA$area_acres) #density over acre
+ names(DensityOverSpaceMA) <- c("pop", "area_acres", "ct10_id", "dAcre")
+DensityOverSpaceMA$newColumn <- (DensityOverSpaceMA$dAcre/640) # density over sq mile
+ names(DensityOverSpaceMA) <- c("pop", "area_acres", "ct10_id", "dAcre", "dSqMile")
+Density <- as.data.frame(DensityOverSpaceMA)
+df3 <- polygonCensusTract %>%  
+    mutate(ct10_id = as.numeric(ct10_id))
+DensityCensusTractJoin<- left_join(Density, df3, by = "ct10_id")
+df4 <- polygonCensusTract %>%  
+    mutate(ct10_id = as.numeric(ct10_id))
+DensityCensusTractJoin<- left_join(Density, df4, by = "ct10_id")
+DensitySfObj<-st_as_sf(DensityCensusTractJoin)
+Density_plot <- ggplot(data = DensitySfObj) + geom_sf(aes(fill = dSqMile))
+print(Density)
+p <- plot(Density_plot, col = "dSqMile", pch = 20, add = TRUE)
+print(p)
+st_transformDensity <- st_transform(DensitySfObj, crs = 4326)
+st_county <- st_transform(county, crs = 4326)
+st_county_Density <- sf::st_intersects(st_county, st_transformDensity)
+print(st_county_Density)
+DensityWoo <- as.data.frame(st_county_Density)
+p2 <- plot(DensityWoo,  col = "blue", pch = 20, add = TRUE)
+
+
+
+```
+# join
+# I turned all 3 data frames into a list then used an lapply to merge them into a singular data frame this completed the joins
+# Join 1: Pop Census Tract to Census tract Poly on ct10_id table place
+# Join 2: Pop Census Tract to Census tract Poly on ct10_id table place
+# Joins so Roads etc to main map 
+
+
+```
+
+```{r, eval = FALSE}
+# Projection and printing
+```
+
+```{r, eval = FALSE}
+# Test
+class(vehicle)
+class(censusTractPolygon)
+class(censusTractPop)
+class(censusTractList)
+class(censusTractDf1)
+class(popDensityTable)
+
+
+```
+
+```{r, eval = FALSE}
+# Figure 3
+```
+
+```{r, eval = FALSE}
+# Figure #4
+```
