@@ -14,11 +14,33 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Introduction
 
-- The purpose of this project is to prove that geospatial analysis using R
+The WRTA route and stop configuration is selected in a manual manner
+
+The purpose of this project is to prove that geospatial analysis using R
 can provide unique insights into the functioning of transit systems.
 
 
 ## Data
+
+The vast majority of our data is derived from WRTA reports, TIGER shapefiles, and 
+census data. Some examples can be seen below.
+
+```{r}
+
+```
+
+
+## Methods
+
+Our methodology is fairly straight forward. For this project we have four 
+deliverables. They are:
+
+- Population Density Map
+- Traffic Count Map
+- Categorization of Ridership Map
+- Routes above maximum subsidy 
+
+
 
 ```{r}
 ```
