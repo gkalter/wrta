@@ -23,46 +23,21 @@ library(dplyr)
 library(rgdal)
 ```
 
-# Reading in Files
-```{r}
-stops <- read_sf(dsn = "Active_WRTA_Bus_Stops_Aug2020.shp", package = "wrta", 
-                 layer = "SHAPEFILE")
-  (system.file("Active_WRTA_Bus_Stops_Aug2020.shp", package = "wrta")) %>% 
-  st_read() 
 
-routes <- read_sf(dsn = "Read_In/tl_2018_25027_roads.shp", package = "wrta",
-                  layer = "SHAPEFILE")
-
- %>% plot()
-
-ridership <- (system.file("Read_In/Weekday_ridership.xlsx", package = "wrta")) %>% st_read()
-roads <- read_sf(dsn = "Read_In/tl_2018_25027_roads", package = "wrta", 
-                 layer = "SHAPEFILE") %>% st_read
-```
-
-```{r}
+```{r, eval = FALSE}
 ridership <- system.file("extdata/Weekday_ridership.xlsx", package = "wrta") %>% 
   st_read() 
 stops <- system.file("extdata/county.shp", package = "wrta") %>% st_read()
 ```
 
 #Locally Stored Version
-```{r}
-ridership <- ("/Users/garrenkalter/Desktop/wrta/Read_In/Weekday_ridership.xlsx") %>% 
-  st_read()
+```{r,eval = FALSE}
 
-routes <- ("/Users/garrenkalter/Desktop/wrta/Read_In/WRTA\ August\ 2020/Active_WRTA_Routes_Aug2020.shp") %>% st_read() %>% st_zm()
-
-roads <- ("/Users/garrenkalter/Desktop/wrta/Read_In/tl_2018_25027_roads/tl_2018_25027_roads.shp") %>% st_read() %>% plot()
-
-worcester_ct <- ("/Users/garrenkalter/Desktop/wrta/Read_In/tl_2017_25027_faces/tl_2017_25027_faces.shp") %>% st_read() %>% plot()
-
-stops <- ("/Users/garrenkalter/Desktop/wrta/Read_In/WRTA\ August\ 2020/Active_WRTA_Bus_Stops_Aug2020.shp") %>% st_read
 
 ```
 
 # Join
-```{r}
+```{r, eval = FALSE}
 #Identifying whether variables Match
 routes$Bus_Route %in% ridership$ROUTE
 
@@ -73,7 +48,7 @@ full_join(as_tibble(ridership), routes, by = c("ROUTE" = "BusRoute"))
 
 
 # Map Categorizing Routes
-```{r}
+```{r, eval = FALSE}
  # category map
 
 ridership %>% 
@@ -86,7 +61,7 @@ ridership %>%
 
 # Map Showcasing Routes above Maximum Allowable Subsidy
 
-```{r}
+```{r, eval = FALSE}
 > districts2 %>% 
 +   mutate(yld_cat = ifelse(yield > , "high", "other") , 
 +          yld_cat = ifelse(between(yield, 3.5, 4.5), "medium", yld_cat),

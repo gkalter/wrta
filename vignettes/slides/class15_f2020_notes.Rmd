@@ -1,0 +1,147 @@
+
+
+## Class 15 notes
+### Negative selection
+```{r}
+library(dplyr)
+dummy_df <- data.frame(a = 1:100, 
+                       b = sample(letters, size = 100, replace = TRUE), 
+                       d = 1:100, 
+                       e = 1:100)
+dummy_df %>% as_tibble() %>% 
+  select(-b, -e)
+dummy_df %>% as_tibble() %>% 
+  select(-c(2, 4))
+dummy_df[, -c(2, 4)]
+dummy_df[, -c(grep("b|d", colnames(dummy_df)))]
+
+dummy_df %>% as_tibble() %>% select(a, d)
+```
+
+## Spot the bug
+### 1
+```{r, error = TRUE}
+library(geospaar)
+# wrong
+farmers <- system.file("extdata/farmer_spatial.csv", package = "geospaar") %>% 
+  read_csv() %>% st_as_sfc(coords = c("X", "y"))
+# right
+farmers <- system.file("extdata/farmer_spatial.csv", package = "geospaar") %>%
+  read_csv() %>% st_as_sf(coords = c("x", "y"))
+
+# wrong
+districts <- st_reader(
+  system.file("extdata/districts.shp", package = "geospaar")
+)
+# right
+districts <- st_read(
+  system.file("extdata/districts.shp", package = "geospaar")
+)
+# wrong
+roads <- read_sfc(system.file("extdata/roads.shp", package = "geospaar"))
+# right
+roads <- read_sf(system.file("extdata/roads.shp", package = "geospaar"))
+
+```
+
+### Arranging data
+```{r, error = TRUE}
+# wrong
+farmers %>% groupby(uuid) %>% summarize(n = n) %>% arrange(n)
+# right
+farmers %>% group_by(uuid) %>% summarize(n = n()) %>% arrange(desc(n))
+```
+### Spatial join
+```{r, error = TRUE}
+# Wrong
+farmers_trim <- farmers %>% groupby(uuid) %>% summarize(n = n) %>% 
+  st_joins(., districts, Left = FALSE)
+
+# first assign crs
+st_crs(farmers) <- st_crs(districts)  # option 1
+farmers <- system.file("extdata/farmer_spatial.csv", package = "geospaar") %>%
+  read_csv() %>% st_as_sf(coords = c("x", "y"), crs = 4326)  # option 2
+
+farmers_trim <- farmers %>% group_by(uuid) %>% summarize(n = n()) %>% 
+  st_join(., districts, left = FALSE)
+
+ggplot(districts) + geom_sf() + 
+  geom_sf(data = farmers_trim)
+districts %>% st_geometry() %>% plot()
+farmers_trim %>% st_geometry() %>% plot(add = TRUE)
+
+```
+
+### Reproject and calculate area of projected districts
+```{r, error = TRUE}
+# wrong
+districts %>% st_transforms(., stcrs(roads)) %>% st_areas()
+
+# right
+districts %>% st_transform(., st_crs(roads)) %>% st_area()
+districts %>% st_transform(., st_crs(roads)) %>% st_area() %>% .[] / 10000
+districts %>% st_transform(., st_crs(roads)) %>% st_area() %>% 
+  as.numeric(.) / 10000
+districts %>% st_transform(., st_crs(roads)) %>% st_area() %>% 
+  units::set_units(., "ha")
+```
+
+### Add columns using `case_when`
+```{r,error = TRUE}
+set.seed(2)
+districts2 <- cbind(
+  districts, st_centroid(districts) %>% st_coordinates()
+) %>% 
+  mutate(yield = (7 - 0.25 * -Y) * runif(n = nrow(.), min = 0.9, max = 1.2)) %>%
+  dplyr::select(distName, X, Y, yield)
+
+districts2 <- districts2 %>% 
+  mutate(
+    grp = case_when(
+      grepl("Cha", distName) ~ "A",
+      grepl("Chi", distName) ~ "B", 
+      grepl("^L", distName) ~ "C", 
+      TRUE ~ "D"
+    )
+  ) %>% dplyr::select(distName, grp, X, Y, yield)
+
+# districts2 <- districts2 %>% 
+#   mutate(grp = ifelse(grepl("Cha", distName), "A", NA), 
+#          grp = ifelse(grepl("Chi", distName), "B", grp), 
+#          grp = ifelse(grepl("^L", distName), "C", grp), 
+#          grp = ifelse(is.na(grp), "D", grp)
+#          ) %>% 
+#   dplyr::select(distName, grp, X, Y, yield)
+# 
+# districts2 %>% View()
+ggplot(districts2) + geom_sf(aes(fill = yield))
+
+# ggplot(districts2) + geom_sf(aes(fill = yield))
+```
+
+### Summarizing with `sf`
+```{r, error = TRUE}
+districts2 %>% dplyr::select(yield) %>% summarize_all(funs(mean, sd))
+
+districts2 %>% summarize(mean(yield), sd(yield)) #%>% plot()
+
+# mean yields by yield category
+districts_mu <- districts2 %>% 
+  mutate(yld_cat = ifelse(yield > 3.5, "high", "other"), 
+         yld_cat = ifelse(between(yield, 3.5, 4.5), "medium", yld_cat),
+         yld_cat = ifelse(yield < 3.5, "low", yld_cat)) %>% 
+  dplyr::select(1:5, 7) %>% 
+  group_by(yld_cat) %>% summarize(yield = mean(yield))
+
+ggplot(districts_mu) + geom_sf(aes(fill = yield))
+
+# category map
+districts2 %>% 
+  mutate(yld_cat = ifelse(yield > 3.5, "high", "other"), 
+         yld_cat = ifelse(between(yield, 3.5, 4.5), "medium", yld_cat),
+         yld_cat = ifelse(yield < 3.5, "low", yld_cat)) %>% 
+  ggplot() + geom_sf(aes(fill = yld_cat))
+
+```
+
+
