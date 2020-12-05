@@ -17,8 +17,6 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 # Packages
-
-library(wrta)
 library(dplyr)
 library(ggplot2)
 library(rgdal)
@@ -49,14 +47,18 @@ censusTractPop <- system.file("extdata/tabular.demo_general_demographics_ct_2010
 
 ```{r, eval = FALSE}
 # summary statistics and joins for setup
+worcestercounty <- subset(county, NAME = "COUNTYFP" , drop = FALSE)
+
 censusTractDf <- left_join(censusTractPop, vehicle, by = "ct10_id") #joining data frames
-df2 <- polygonCensusTract %>%  
-    mutate(ct10_id = as.numeric(ct10_id)) # convery type to numeric
-censusTractDf1 <- left_join(df2, censusTractDf, by = "ct10_id") #joining new dataset
+censusTractdf_2 <- polygonCensusTract %>%  
+    mutate(ct10_id = as.numeric(ct10_id)) # convert type to numeric
+censusTractDf1 <- left_join(censusTractdf_2, censusTractDf, by = "ct10_id") #joining new dataset
 popDensityTable<- censusTractDf1[ , c("pop", "area_acres", "ct10_id" )] %>% st_set_geometry(NULL)
 popDensityTable
+class(popDensityTable)
 lapply(popDensityTable[ ,c(1:2)], as.numeric)
 DensityOverSpaceMA <- lapply(popDensityTable, function(x) as.numeric(as.character(x)))
+
 DensityOverSpaceMA$newColumn <- (DensityOverSpaceMA$pop / DensityOverSpaceMA$area_acres) #density over acre
  names(DensityOverSpaceMA) <- c("pop", "area_acres", "ct10_id", "dAcre")
 DensityOverSpaceMA$newColumn <- (DensityOverSpaceMA$dAcre/640) # density over sq mile
@@ -70,18 +72,15 @@ df4 <- polygonCensusTract %>%
 DensityCensusTractJoin<- left_join(Density, df4, by = "ct10_id")
 DensitySfObj<-st_as_sf(DensityCensusTractJoin)
 Density_plot <- ggplot(data = DensitySfObj) + geom_sf(aes(fill = dSqMile))
-print(Density)
-p <- plot(Density_plot, col = "dSqMile", pch = 20, add = TRUE)
-print(p)
-st_transformDensity <- st_transform(DensitySfObj, crs = 4326)
-st_county <- st_transform(county, crs = 4326)
+Density_plot 
+v  <- 4326
+st_transformDensity <- st_transform(DensitySfObj, crs = v)
+st_county <- st_transform(county, crs = v)
+Worcester_county <- st_county %>% filter (COUNTYFP == 027)
 st_county_Density <- sf::st_intersects(st_county, st_transformDensity)
-print(st_county_Density)
-DensityWoo <- as.data.frame(st_county_Density)
-p2 <- plot(DensityWoo,  col = "blue", pch = 20, add = TRUE)
-
-
-
+unlisted_Dw <- unlist(st_county_Density)
+Worcester_Density_Df <-as.data.frame(unlisted_Dw)
+Worcester_Density_Censis_Tract <-suppressWarnings(plot(,  col = "blue", pch = 20, add = TRUE)) 
 ```
 # join
 # I turned all 3 data frames into a list then used an lapply to merge them into a singular data frame this completed the joins
