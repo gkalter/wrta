@@ -21,18 +21,25 @@ library(wrta)
 library(sf)
 library(dplyr)
 library(rgdal)
+library(ggplot2)
 ```
 
-
+#Reading in Data
 ```{r, eval = FALSE}
 ridership <- system.file("extdata/Weekday_ridership.xlsx", package = "wrta") %>% 
   st_read() 
-stops <- system.file("extdata/county.shp", package = "wrta") %>% st_read()
-```
 
-#Locally Stored Version
-```{r,eval = FALSE}
+county <- system.file("extdata/tl_2017_25027_faces/tl_2017_25027_faces.shp",
+                     package = "wrta") %>% st_read()
 
+roads <- system.file("extdata/tl_2018_25027_roads/tl_2018_25027_roads.shp",
+                     package = "wrta") %>% st_read()
+
+stops <- system.file("extdata/WRTA_August_2020/Active_WRTA_Bus_Stops_Aug2020.shp",
+                     package = "wrta") %>% st_read()
+
+routes <- system.file("extdata/WRTA_August_2020/Active_WRTA_Routes_Aug2020.shp",
+                      package = "wrta") %>% st_read() %>% st_zm()
 
 ```
 
@@ -42,15 +49,53 @@ stops <- system.file("extdata/county.shp", package = "wrta") %>% st_read()
 routes$Bus_Route %in% ridership$ROUTE
 
 #completing a join via coercion
-full_join(as_tibble(ridership), routes, by = c("ROUTE" = "BusRoute"))
+ridership <- right_join(x = as_tibble(ridership), y = routes, by = c("ROUTE" = "BusRoute")) 
 
 ```
 
 
+```{r, eval = FALSE}
+#cleaning data up
+cat <- ridership %>% distinct(ROUTE, .keep_all = TRUE) %>% as.data.frame() 
+
+#generating a new field to categorize ridership
+cat2 <- cat %>% 
+  mutate(ride_cat = ifelse(WKDAY_RIDERS > 200000, "high", "other"), 
+         ride_cat = ifelse(between(WKDAY_RIDERS, 100000, 199999), "medium", ride_cat),
+         ride_cat = ifelse(WKDAY_RIDERS < 100000, "low", ride_cat)) %>% 
+  st_as_sf(sf_column_name = geometry)
+cat3 <- st_as_sf(cat2, sf_column_name = geometry)
+
+ggplot(cat2) + geom_sf(aes(fill = "ride_cat"))
+plot(cat2)
+
+
+ridership %>% summarize(mean(WKDAY_RIDERS), sd(WKDAY_RIDERS)) #%>% plot()
+
+# mean yields by yield category
+districts_mu <- districts2 %>% 
+  mutate(yld_cat = ifelse(yield > 3.5, "high", "other"), 
+         yld_cat = ifelse(between(yield, 3.5, 4.5), "medium", yld_cat),
+         yld_cat = ifelse(yield < 3.5, "low", yld_cat)) %>% 
+  dplyr::select(1:5, 7) %>% 
+  group_by(yld_cat) %>% summarize(yield = mean(yield))
+
+ggplot(districts_mu) + geom_sf(aes(fill = yield))
+
+# category map
+districts2 %>% 
+  mutate(yld_cat = ifelse(yield > 3.5, "high", "other"), 
+         yld_cat = ifelse(between(yield, 3.5, 4.5), "medium", yld_cat),
+         yld_cat = ifelse(yield < 3.5, "low", yld_cat)) %>% 
+  ggplot() + geom_sf(aes(fill = yld_cat))
+
+```
+
 # Map Categorizing Routes
 ```{r, eval = FALSE}
+categories <- quantile(raintot, probs = seq(0, 1, 1 / 3)) quan
  # category map
-
+plot(county)
 ridership %>% 
   mutate(WKDAY_RIDERS_cat = ifelse(WKDAY_RIDERS > 100000, "high", WKDAY_RIDERS_cat),  
           WKDAY_RIDERS_cat = ifelse(between(WKDAY_RIDERS, 10000, 99999), "medium", WKDAY_RIDERS_cat),
