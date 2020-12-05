@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Introduction
 
-The WRTA route and stop configuration is selected in a manual manner
+WRTA route and stop configuration is selected in a manual manner
 
 The purpose of this project is to prove that geospatial analysis using R
 can provide unique insights into the functioning of transit systems.
@@ -26,6 +26,11 @@ The vast majority of our data is derived from WRTA reports, TIGER shapefiles, an
 census data. Some examples can be seen below.
 
 ```{r}
+library(rasterVis)
+
+png("inst/external/figs/Subsidy.png", bg = "transparent", height = 4, 
+    width = 3, res = 300, units = "in")
+dev.off
 
 ```
 
@@ -37,8 +42,10 @@ deliverables. The methodology deployed is as follows:
 
 - Population Density Map (Read in data --> Rasterize it --> Display it)
 - Traffic Count Map (Read in --> Rasterize it --> Display it)
-- Categorization of Ridership Map (Preprocess --> Read In --> Join with Line Data --> Rasterize --> Create categories --> Display it)
-- Routes above maximum subsidy (Preprocess --> Read In --> Join with Line Data --> Rasterize --> Create Categories --> Display it)
+- Categorization of Ridership Map (Preprocess --> Read In --> Join with Line Data --> Create categories --> Display)
+- Routes above maximum subsidy (Preprocess --> Read In --> Join with Line Data --> Create Categories --> Display)
+- Route Headway (Preprocess --> Read In --> Join with Line Data --> Create Categories --> Display)
+- 
 
 ## Results
 
