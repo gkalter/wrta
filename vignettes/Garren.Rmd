@@ -64,14 +64,14 @@ ridershipd <- as.numeric(ridership)
 
 #completing a join via coercion
 route_ridership <- left_join(x = ridership, y = routes_c, 
-                             by = c("ROUTE" = "BusRoute")) %>% as_sf()
+                             by = c("ROUTE" = "BusRoute")) 
 
 ```
 
 
 ```{r, eval = FALSE}
 #cleaning data up
-cat <- ridership %>% distinct(ROUTE, .keep_all = TRUE) %>% as.data.frame() 
+cat <- ridership %>% distinct(ROUTE, .keep_all = TRUE) 
 route_ridership <- 
 
 #generating a new field to categorize ridership
