@@ -27,7 +27,7 @@ library(ggplot2)
 #Reading in Data
 ```{r, eval = FALSE}
 ridership <- system.file("extdata/Weekday_ridership.xlsx", package = "wrta") %>% 
-  st_read() 
+  readxl::read_excel() 
 
 county <- system.file("extdata/tl_2017_25027_faces/tl_2017_25027_faces.shp",
                      package = "wrta") %>% st_read()
@@ -49,26 +49,28 @@ routes <- system.file("extdata/WRTA_August_2020/Active_WRTA_Routes_Aug2020.shp",
 routes$Bus_Route %in% ridership$ROUTE
 
 #completing a join via coercion
-ridership <- right_join(x = as_tibble(ridership), y = routes, by = c("ROUTE" = "BusRoute")) 
-
+routes_ridership <- right_join(x = ridership, 
+                               y = routes, by = c("ROUTE" = "BusRoute")) 
 ```
 
 
 ```{r, eval = FALSE}
 #cleaning data up
-cat <- ridership %>% distinct(ROUTE, .keep_all = TRUE) %>% as.data.frame() 
+distinct_routes <- routes_ridership %>% distinct(ROUTE, .keep_all = TRUE) 
+#%>% as.data.frame()
 
 #generating a new field to categorize ridership
-cat2 <- cat %>% 
+distinct_routes_filter$ride_cat
+distinct_routes_filter <- distinct_routes %>% 
   mutate(ride_cat = ifelse(WKDAY_RIDERS > 200000, "high", "other"), 
          ride_cat = ifelse(between(WKDAY_RIDERS, 100000, 199999), "medium", ride_cat),
          ride_cat = ifelse(WKDAY_RIDERS < 100000, "low", ride_cat)) %>% 
-  st_as_sf(sf_column_name = geometry)
-cat3 <- st_as_sf(cat2, sf_column_name = geometry)
+  st_as_sf()
+# cat3 <- st_as_sf(cat2, sf_column_name = geometry)
 
-ggplot(cat2) + geom_sf(aes(fill = "ride_cat"))
-plot(cat2)
+ggplot(distinct_routes_filter) + geom_sf(aes(color = ride_cat))
 
+### stopped editing here
 
 ridership %>% summarize(mean(WKDAY_RIDERS), sd(WKDAY_RIDERS)) #%>% plot()
 
