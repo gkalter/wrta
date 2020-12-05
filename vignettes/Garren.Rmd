@@ -13,8 +13,77 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+#Reading in Data
+```{r, eval = FALSE}
+ridership <- system.file("extdata/Weekday_ridership.xlsx", package = "wrta") %>% 
+  readxl::read_excel() 
+county <- system.file("extdata/tl_2017_25027_faces/tl_2017_25027_faces.shp",
+                     package = "wrta") %>% st_read()
+roads <- system.file("extdata/tl_2018_25027_roads/tl_2018_25027_roads.shp",
+                     package = "wrta") %>% st_read()
+stops <- system.file("extdata/WRTA_August_2020/Active_WRTA_Bus_Stops_Aug2020.shp",
+                     package = "wrta") %>% st_read()
+routes <- system.file("extdata/WRTA_August_2020/Active_WRTA_Routes_Aug2020.shp",
+                      package = "wrta") %>% st_read() %>% st_zm()
+```
+
+# Join
+```{r, eval = FALSE}
+#Identifying whether variables Match
+routes$Bus_Route %in% ridership$ROUTE
+
+#completing a join via coercion
+routes_ridership <- right_join(x = ridership, 
+                               y = routes, by = c("ROUTE" = "BusRoute")) 
+```
+
+## Categories Map
+```{r, eval = FALSE}
+#cleaning data up
+distinct_routes <- routes_ridership %>% distinct(ROUTE, .keep_all = TRUE) 
+
+#generating a new field to categorize ridership
+distinct_routes_filter$ride_cat
+distinct_routes_filter <- distinct_routes %>% 
+  mutate(ride_cat = ifelse(WKDAY_RIDERS > 200000, "high", "other"), 
+         ride_cat = ifelse(between(WKDAY_RIDERS, 100000, 199999), "medium", ride_cat),
+         ride_cat = ifelse(WKDAY_RIDERS < 100000, "low", ride_cat)) %>% 
+  st_as_sf()
+
+ggplot(distinct_routes_filter) + geom_sf(aes(color = ride_cat))
+```
+
+## Subsidies Map
+```{r}
+
+subsidy_routes_filter$sub_cat
+subsidy_routes_filter <- distinct_routes %>% 
+  mutate(sub_cat = ifelse(subsidy > 10, "high", "other"), 
+         sub_cat = ifelse(between(subsidy, 3, 10), "medium", sub_cat),
+         sub_cat = ifelse(subsidy < 3, "low", sub_cat)) %>% 
+  st_as_sf()
+
+ggplot(subsidy_routes_filter) + geom_sf(aes(color = sub_cat))
+```
 
 
+## Headways Map
+
+```{r}
+headways_routes_filter$head_cat
+headways_routes_filter <- distinct_routes %>% 
+  mutate(head_cat = ifelse(subsidy > 60, "high", "other"), 
+         head_cat = ifelse(between(subsidy, 30, 60), "medium", head_cat),
+         head_cat = ifelse(subsidy < 30, "low", head_cat)) %>% 
+  st_as_sf()
+
+ggplot(headways_routes_filter) + geom_sf(aes(color = head_cat))
+
+
+```
+
+
+```{r, eval = FALSE}
 #Libraries Used
 ```{r setup}
 library(wrta)
@@ -26,7 +95,10 @@ library(ggplot2)
 
 #Reading in Data
 ```{r, eval = FALSE}
-ridership <- system.file("extdata/Weekday_ridership.xlsx", package = "wrta") %>% st_read
+#ridership <- system.file("extdata/Weekday_ridership.xlsx", package = "wrta") %>% st_read
+
+ridership <- system.file("extdata/Weekday_ridership.csv", package = "wrta") %>% 
+  readr::read_csv(.)
 
 county <- system.file("extdata/Worcester/worcester.shp",
                      package = "wrta") %>% st_read() 
@@ -38,7 +110,8 @@ stops <- system.file("extdata/WRTA_August_2020/Active_WRTA_Bus_Stops_Aug2020.shp
                      package = "wrta") %>% st_read()
 
 routes <- system.file("extdata/WRTA_August_2020/Active_WRTA_Routes_Aug2020.shp",
-                      package = "wrta") %>% read_sf() %>% st_zm() %>% st_geometry()
+                      package = "wrta") %>% read_sf() %>% st_zm() 
+
 
 ```
 
@@ -57,28 +130,46 @@ routes <- system.file("extdata/WRTA_August_2020/Active_WRTA_Routes_Aug2020.shp",
 #Identifying whether variables Match
 routes$Bus_Route %in% ridership$ROUTE
 
+routes_spatial <- signature(obj = SpatialLinesDataFrame)
+
 #clean data
-routes_c <- routes %>% dplyr::select(BusRoute, Shape_Leng, geometry) %>% as.SpatialLines.SLDF()
+routes_c <- routes %>% dplyr::select(BusRoute, Shape_Leng, geometry)
 
 ridershipd <- as.numeric(ridership)
 
 #completing a join via coercion
 route_ridership <- left_join(x = ridership, y = routes_c, 
                              by = c("ROUTE" = "BusRoute")) 
+plot(route_ridership)
+route_ridership_spatial <- SpatialLinesDataFrame(LinesList = "routes", 
+                                                 data = "ridership")
 
 ```
 
-
+#Generating New Fields
 ```{r, eval = FALSE}
 #cleaning data up
 cat <- ridership %>% distinct(ROUTE, .keep_all = TRUE) 
 route_ridership <- 
 
 #generating a new field to categorize ridership
-cat2 <- route_ridership %>% 
+ridership <- ridership %>% 
   mutate(ride_cat = ifelse(WKDAY_RIDERS > 200000, "high", "other"), 
          ride_cat = ifelse(between(WKDAY_RIDERS, 100000, 199999), "medium", ride_cat),
-         ride_cat = ifelse(WKDAY_RIDERS < 100000, "low", ride_cat)) %>% 
+         ride_cat = ifelse(WKDAY_RIDERS < 100000, "low", ride_cat)) %>% st_as_sf
+#generating a new field to categorize 
+ridership <- ridership %>% 
+  mutate(sub_cat = ifelse(subsidy > 10, "high", "other"), 
+         sub_cat = ifelse(between(subsidy, 3, 10), "medium", sub_cat),
+         sub_cat = ifelse(subsidy < 3, "low", sub_cat)) 
+
+ridership <- ridership %>% as_tibble() %>% 
+  full_join(routes_c, by = c("ROUTE" = "BusRoute"))
+
+ridership <- ridership %>% SpatialLinesDataFrame(data = ridership, lines = routes_c)
+ridership <- cbind.data.frame(ridership, routes_c)
+
+%>% 
   ggplot() + geom_sf(aes(fill = geometry)
                      
 plot(county %>% st_geometry, col ="grey")
