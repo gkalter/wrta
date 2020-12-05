@@ -26,20 +26,29 @@ library(ggplot2)
 
 #Reading in Data
 ```{r, eval = FALSE}
-ridership <- system.file("extdata/Weekday_ridership.xlsx", package = "wrta") %>% 
-  st_read() 
+ridership <- system.file("extdata/Weekday_ridership.csv", package = "wrta") %>% st_read
 
-county <- system.file("extdata/tl_2017_25027_faces/tl_2017_25027_faces.shp",
-                     package = "wrta") %>% st_read()
+county <- system.file("extdata/Worcester/worcester.shp",
+                     package = "wrta") %>% st_read() 
 
-roads <- system.file("extdata/tl_2018_25027_roads/tl_2018_25027_roads.shp",
-                     package = "wrta") %>% st_read()
+roads <- system.file("extdata/MassDOT_Roads_SHP/EOTMAJROADS_ARC.shp",
+                     package = "wrta") %>% st_read() 
 
 stops <- system.file("extdata/WRTA_August_2020/Active_WRTA_Bus_Stops_Aug2020.shp",
                      package = "wrta") %>% st_read()
 
 routes <- system.file("extdata/WRTA_August_2020/Active_WRTA_Routes_Aug2020.shp",
-                      package = "wrta") %>% st_read() %>% st_zm()
+                      package = "wrta") %>% read_sf() %>% st_zm()
+
+```
+
+#Cropping
+```{r, eval = FALSE}
+#roads_worc <- st_intersection(x = roads, y = county) 
+
+#stops <- st_transform
+#(x = stops, crs = county)
+#stops_worc <- st_intersection(x = stops, y = county, crs)
 
 ```
 
@@ -48,8 +57,13 @@ routes <- system.file("extdata/WRTA_August_2020/Active_WRTA_Routes_Aug2020.shp",
 #Identifying whether variables Match
 routes$Bus_Route %in% ridership$ROUTE
 
+#clean data
+routes_c <- routes %>% select(BusRoute, Shape_Leng, geometry) 
+
+ridershipd <- as.numeric(ridership)
+
 #completing a join via coercion
-ridership <- right_join(x = as_tibble(ridership), y = routes, by = c("ROUTE" = "BusRoute")) 
+route_ridership <- left_join(x = as.numeric(ridershipd), y = routes_c, by = c("ROUTE", "BusRoute")) 
 
 ```
 
@@ -59,11 +73,15 @@ ridership <- right_join(x = as_tibble(ridership), y = routes, by = c("ROUTE" = "
 cat <- ridership %>% distinct(ROUTE, .keep_all = TRUE) %>% as.data.frame() 
 
 #generating a new field to categorize ridership
-cat2 <- cat %>% 
+cat2 <- route_ridership %>% 
   mutate(ride_cat = ifelse(WKDAY_RIDERS > 200000, "high", "other"), 
          ride_cat = ifelse(between(WKDAY_RIDERS, 100000, 199999), "medium", ride_cat),
          ride_cat = ifelse(WKDAY_RIDERS < 100000, "low", ride_cat)) %>% 
-  st_as_sf(sf_column_name = geometry)
+  ggplot() + geom_sf(aes(fill = geometry)
+
+test <- as_Spatial(cat2)
+%>% 
+  st_geometry()
 cat3 <- st_as_sf(cat2, sf_column_name = geometry)
 
 ggplot(cat2) + geom_sf(aes(fill = "ride_cat"))
@@ -102,6 +120,7 @@ ridership %>%
         WKDAY_RIDERS_cat = ifelse(WKDAY_RIDERS < 10000, "low", WKDAY_RIDERS_cat),
         WKDAY_RIDERS_cat = ifelse(WKDAY_RIDERS, "No Route", WKDAY_RIDERS_cat)) %>% 
     ggplot() + geom_sf(aes(fill = yld_cat))
+
 ```
 
 # Map Showcasing Routes above Maximum Allowable Subsidy
