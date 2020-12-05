@@ -26,7 +26,7 @@ library(ggplot2)
 
 #Reading in Data
 ```{r, eval = FALSE}
-ridership <- system.file("extdata/Weekday_ridership.csv", package = "wrta") %>% st_read
+ridership <- system.file("extdata/Weekday_ridership.xlsx", package = "wrta") %>% st_read
 
 county <- system.file("extdata/Worcester/worcester.shp",
                      package = "wrta") %>% st_read() 
@@ -38,7 +38,7 @@ stops <- system.file("extdata/WRTA_August_2020/Active_WRTA_Bus_Stops_Aug2020.shp
                      package = "wrta") %>% st_read()
 
 routes <- system.file("extdata/WRTA_August_2020/Active_WRTA_Routes_Aug2020.shp",
-                      package = "wrta") %>% read_sf() %>% st_zm()
+                      package = "wrta") %>% read_sf() %>% st_zm() %>% st_geometry()
 
 ```
 
@@ -58,12 +58,13 @@ routes <- system.file("extdata/WRTA_August_2020/Active_WRTA_Routes_Aug2020.shp",
 routes$Bus_Route %in% ridership$ROUTE
 
 #clean data
-routes_c <- routes %>% select(BusRoute, Shape_Leng, geometry) 
+routes_c <- routes %>% dplyr::select(BusRoute, Shape_Leng, geometry) %>% as.SpatialLines.SLDF()
 
 ridershipd <- as.numeric(ridership)
 
 #completing a join via coercion
-route_ridership <- left_join(x = as.numeric(ridershipd), y = routes_c, by = c("ROUTE", "BusRoute")) 
+route_ridership <- left_join(x = ridership, y = routes_c, 
+                             by = c("ROUTE" = "BusRoute")) %>% as_sf()
 
 ```
 
@@ -71,6 +72,7 @@ route_ridership <- left_join(x = as.numeric(ridershipd), y = routes_c, by = c("R
 ```{r, eval = FALSE}
 #cleaning data up
 cat <- ridership %>% distinct(ROUTE, .keep_all = TRUE) %>% as.data.frame() 
+route_ridership <- 
 
 #generating a new field to categorize ridership
 cat2 <- route_ridership %>% 
@@ -78,6 +80,9 @@ cat2 <- route_ridership %>%
          ride_cat = ifelse(between(WKDAY_RIDERS, 100000, 199999), "medium", ride_cat),
          ride_cat = ifelse(WKDAY_RIDERS < 100000, "low", ride_cat)) %>% 
   ggplot() + geom_sf(aes(fill = geometry)
+                     
+plot(county %>% st_geometry, col ="grey")
+plot(routes_ridership %>% st_geometry, col = "green", add = TRUE )
 
 test <- as_Spatial(cat2)
 %>% 
