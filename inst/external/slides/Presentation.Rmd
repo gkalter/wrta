@@ -32,6 +32,8 @@ library(geospaar)
 library(sf)
 
 
+png("inst/external/figs/Subsidy.png")
+
 
 
 roads <- system.file("extdata/tl_2018_25027_roads/tl_2018_25027_roads.shp",

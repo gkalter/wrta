@@ -24,7 +24,6 @@ library(wrta)
 library(sf)
 library(dplyr)
 library(rgdal)
-library(ggplot2)
 library(geospaar)
 ```
 
