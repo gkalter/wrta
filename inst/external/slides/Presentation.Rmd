@@ -25,7 +25,31 @@ can provide unique insights into the functioning of transit systems.
 The vast majority of our data is derived from WRTA reports, TIGER shapefiles, and 
 census data. Some examples can be seen below.
 
-```{r}
+
+```{r,error = TRUE, echo = FALSE, message = FALSE, error = TRUE, comments = "."}
+library(raster)
+library(geospaar)
+library(sf)
+
+
+
+
+roads <- system.file("extdata/tl_2018_25027_roads/tl_2018_25027_roads.shp",
+                     package = "wrta") %>% st_read()
+
+stops <- system.file("extdata/WRTA_August_2020/Active_WRTA_Bus_Stops_Aug2020.shp",
+                     package = "wrta") %>% st_read()
+
+routes <- system.file("extdata/WRTA_August_2020/Active_WRTA_Routes_Aug2020.shp",
+                      package = "wrta") %>% st_read() %>% st_zm()
+
+worcester <- system.file("extdata/Worcester/worcester.shp",
+                     package = "wrta") %>% st_read()
+
+```
+
+
+```{r, echo = FALSE}
 library(rasterVis)
 
 png("inst/external/figs/Subsidy.png", bg = "transparent", height = 4, 
@@ -52,6 +76,8 @@ deliverables. The methodology deployed is as follows:
 We found that there are many routes which are highly inefficient in Worcester as displayed below:
 
 ```{r}
+
+
 
 ```
 

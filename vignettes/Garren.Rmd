@@ -125,7 +125,7 @@ plot(distinct_route_filter_medium %>% st_geometry(), col = "yellow", add = TRUE)
 plot(distinct_route_filter_high %>% st_geometry(), col = "green", add = TRUE)
 title(main = "Routes Categorized by Ridership")
 legend(x = "bottomright", legend = c("low", "medium", "high"), 
-       fill = c("green", "yellow2", "red"), bty = "n")
+       fill = c("red", "yellow2", "green"), bty = "n")
 ```
 
 ## Subsidies Map Mutation
