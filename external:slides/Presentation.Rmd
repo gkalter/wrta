@@ -79,7 +79,7 @@ legend(x = "bottomright", legend = c("low", "medium", "high"),
 
 ```
 
-```{r, fig.align ='center', out.width = "60%"}
+```{r, fig.align ='center', out.width = "90%"}
 
 
 knitr::include_graphics("figures/pop_dense.png")
@@ -101,14 +101,14 @@ legend(x = "bottomright", legend = c("low", "medium", "high"),
 ```
 
 
-```{r, fig.align ='center', out.width = "50%"}
+```{r, fig.align ='center', out.width = "80%"}
 
-knitr::include_graphics("figures/veh_dense.png")
+knitr::include_graphics("figures/vehicle_dense.png")
 ```
 
 ## Results - Ridership
 This map showcases ridership. While the categories are somewhat arbitrary, we
-tried to simulate a natural Jenks break in the data. So low riderhip is below 10k
+tried to simulate a Natural Jenks Break in the data. So low ridership is below 10k
 weekday riders per annum, medium ridership is between 10k and 170k riders per annum,
 and high ridership is anything above 170k riders per annum.
 
@@ -124,7 +124,7 @@ legend(x = "bottomright", legend = c("low", "medium", "high"),
 ```
 
 
-```{r, fig.align= 'center', out.width = "55%"}
+```{r, fig.align= 'center', out.width = "80%"}
 
 knitr::include_graphics("figures/Ridership_cat.png")
 
@@ -132,7 +132,9 @@ knitr::include_graphics("figures/Ridership_cat.png")
 
 ## Results - Subsidy
 This map showcases subsidy. While there was a lot of literature on this, nothing
-quite worked with Worcester. So this map displays subsidy above and below the system average of 3 dollars, and had a high category for outliers above ten dollars. Folks who take the Park Avenue Connector may be paying a buck seventy five, but it costs a whopping 28 dollars per person!
+quite worked with Worcester. So this map displays subsidy above and below the system average of 3 dollars, and had a high category for outliers above ten dollars. 
+
+- Folks who take the Park Avenue Connector may be paying a buck seventy five, but it costs a whopping 28 dollars per person!
 
 ```{r, echo= FALSE, eval = FALSE}
 par(mar = c(0, 0, 1, 0))
@@ -146,9 +148,9 @@ legend(x = "bottomright", legend = c("low", "medium", "high"),
 ```
 
 
-```{r, fig.align ='center', out.width = "55%" }
+```{r, fig.align ='center', out.width = "75%" }
 
-knitr::include_graphics("figures/subs_cat.png")
+knitr::include_graphics("figures/subs_final.png")
 
 ```
 
@@ -169,7 +171,7 @@ legend(x = "bottomright", legend = c("low", "medium", "high"),
 ```
 
 
-```{r, fig.align ='center', out.width = "60%"}
+```{r, fig.align ='center', out.width = "90%"}
 
 knitr::include_graphics("figures/frequency_cat.png")
 ```
@@ -188,7 +190,7 @@ title("Routes that are Good Candidates for BRT")
 ```
 
 
-```{r, fig.align ='center', out.width = "70%", echo = FALSE, eval = FALSE}
+```{r, fig.align ='center', out.width = "100%"}
 
 knitr::include_graphics("figures/brt_final.png")
 
@@ -208,7 +210,7 @@ plot(distinct_route_filter_low %>% st_geometry(), col = "red", add = TRUE)
 title("Candidates for Route Removal")
 ```
 
-```{r, fig.align ='center', out.width = "70%" }
+```{r, fig.align ='center', out.width = "100%" }
 
 
 knitr::include_graphics("figures/closure_final.png")
