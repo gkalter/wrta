@@ -13,10 +13,11 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
+  # Setting up document
 ```
 
 ```{r setup}
-# Packages
+# Packages and libraries
 library(dplyr)
 library(ggplot2)
 library(rgdal)
@@ -26,7 +27,6 @@ library(sf)
 
 ```{r, eval = FALSE}
 # Read in files
-# username fix
 ridership <- system.file("extdata/Weekday_ridership.xlsx", package = "wrta") %>% 
   readxl::read_excel() 
 county <- system.file("extdata/tl_2017_25027_faces/tl_2017_25027_faces.shp",
@@ -54,44 +54,43 @@ worcester <- system.file("extdata/Worcester/worcester.shp",
 # summary statistics and joins for setup
 #Cropping
 #reproject
-routes_reprojected <- st_transform(x = routes, crs = st_crs(worcester))
-stops_reprojected  <- st_transform(x = stops, crs = st_crs(worcester))
-roads_reprojected  <- st_transform(x = roads, crs = st_crs(worcester))
+routes_reprojected <- st_transform(x = routes, crs = st_crs(worcester)) # reproject to same CRS
+stops_reprojected  <- st_transform(x = stops, crs = st_crs(worcester)) # reproject to same CRS
+roads_reprojected  <- st_transform(x = roads, crs = st_crs(worcester)) # reproject to same CRS
 #major roads in Worcester
-roads_worc <- st_intersection(x = roads_reprojected , y = worcester) 
+roads_worc <- st_intersection(x = roads_reprojected , y = worcester) #roads worcester intersect
 #bus stops
-stops_worc <- st_intersection(x = stops_reprojected, y = worcester)
+stops_worc <- st_intersection(x = stops_reprojected, y = worcester) # stops worcester intersect
 #bus routes
-routes_worc <- st_intersection(x = routes_reprojected, y = worcester)
-censusTractDataFram1 <- left_join(censusTractPop, vehicle, by = "ct10_id") 
+routes_worc <- st_intersection(x = routes_reprojected, y = worcester) # routes worcester intersect
+censusTractDataFram1 <- left_join(censusTractPop, vehicle, by = "ct10_id")  # join by census tract id
 st)
-censusDataVPOP <- polygonCensusTract %>%  
+censusDataVPOP <- polygonCensusTract %>%  # Polygon convert character to numeric column
     mutate(ct10_id = as.numeric(ct10_id))
 censusDataVPOPPoly <- left_join(censusDataVPOP, censusTractDataFram1, by = "ct10_id") #joining new dataset
-worcester_census <- st_intersection(x = censusDataVPOPPoly, y = worcester) 
+worcester_census <- st_intersection(x = censusDataVPOPPoly, y = worcester)  #census worcester data 
 popDensityTable <- worcester_census[ , c("pop", "area_acres", "area_sqft", "ct10_id", "objectid", "shape")] 
-popDensityTable
+popDensityTable #pop density data worcester
 vehicleDensityTable <- worcester_census[ , c("veh_tot", "area_acres", "area_sqft", "ct10_id", "objectid", "shape")] 
-vehicleDensityTable
+vehicleDensityTable # vehicle density data worcester
 popDensityTable$density_acres <- (popDensityTable$pop/640) # density over acre mile
 popDensityTable$density_sqmile <- (popDensityTable$pop/vehicleDensityTable$area_sqft) # density over sq mile
 vehicleDensityTable$density_acres <- (vehicleDensityTable$veh_tot/640) # density over acre mile
 vehicleDensityTable$density_sqmile <- (vehicleDensityTable$veh_tot/vehicleDensityTable$area_sqft) # density over sq mile
 plot(vehicleDensityTable)
 plot(popDensityTable)
-
-vehicleDensityTable_subset <- subset(vehicleDensityTable, select = c("density_sqmile", "geometry"))
+plot(routes_worc)
+vehicleDensityTable_subset <- subset(vehicleDensityTable, select = c("density_sqmile", "geometry")) #subset to make datasets smaller
 popDensityTable_subset <- subset(popDensityTable, select = c("density_sqmile", "geometry"))
 mean(popDensityTable_subset$density_sqmile)
 mean(vehicleDensityTable_subset$density_sqmile)
-palletecolors <- colors()[1:3]
 ```
 
 ```{r, fig.width=4.75, fig.height=3.75, fig.align = "center"}
 par(mar = c(0, 0, 1, 0))
-set.seed(1)
-Population_Density <- plot(popDensityTable_subset)
+set.seed(1) # plotting
+Population_Density <- plot(popDensityTable_subset,  col = c("orange", "red", "bisque"))
 title("Density")
-Vehicle_Density <- plot(vehicleDensityTable_subset)
+Vehicle_Density <- plot(vehicleDensityTable_subset, col = c("green", "blue", "aquamarine"))
 title("Density")
 ```
