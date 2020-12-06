@@ -13,10 +13,15 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Introduction
 
-WRTA route and stop configuration is selected in a manual manner
+WRTA route and stop configuration is selected in a manual manner. Route configuration
+could benefit from both simple geoprocessing and complex modeling that R is capable of.
 
-The purpose of this project is to prove that geospatial analysis using R
-can provide unique insights into the functioning of transit systems.
+By using geospatial analysis in R, we hope to identify routes that appear to have 
+a disproportionate amount of resources and routes which could benefit from
+increased revenue.
+
+We hope that this project and subsequent thesis will be used to the benefit
+of Worcester's citizenry.
 
 
 ## Data
@@ -31,14 +36,8 @@ library(geospaar)
 library(sf)
 library(wrta)
 
-head(ridership)
-
-png("inst/external/figs/Subsidy.png")
-
-
-
 roads <- system.file("extdata/tl_2018_25027_roads/tl_2018_25027_roads.shp",
-                     package = "wrta") %>% st_read()
+                     package = "wrta") %>% st_read() %>% head()
 
 stops <- system.file("extdata/WRTA_August_2020/Active_WRTA_Bus_Stops_Aug2020.shp",
                      package = "wrta") %>% st_read()
@@ -64,25 +63,25 @@ dev.off
 
 ## Methods
 
-Our methodology is fairly straight forward. For this project we have four 
-deliverables. The methodology deployed is as follows:
+Our methodology is fairly straight forward. We have six deliverables, designed as 
+as follows:
 
-- Population Density Map (Read in data --> Rasterize it --> Display it)
-- Traffic Count Map (Read in --> Rasterize it --> Display it)
+- Population Density Map (Read in data --> Display)
+- Traffic Count Map (Read in --> Display)
 - Categorization of Ridership Map (Preprocess --> Read In --> Join with Line Data --> Create categories --> Display)
 - Routes above maximum subsidy (Preprocess --> Read In --> Join with Line Data --> Create Categories --> Display)
 - Route Headway (Preprocess --> Read In --> Join with Line Data --> Create Categories --> Display)
-- 
+- BRT- Display lowest subsidy and highest ridership routes
+- Closure- Display highest subsidy, lowest ridership, and longest time taken
+
 
 ## Results
 
 We found that there are many inefficiencies in the WRTA as displayed below:
 
-```{r}
+```{r, fig.align='left'}
 
-knitr::include_graphics("figures/Subsidy.png")
-
-
+knitr::include_graphics("figures/Ridership.png")
 
 ```
 

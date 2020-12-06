@@ -211,6 +211,7 @@ par(mar = c(0, 0, 1, 0))
 plot(worcester %>% st_geometry(), col = "grey")
 plot(headways_route_filter_high %>% st_geometry(), col = "red", add = TRUE)
 plot(subsidy_route_filter_high %>% st_geometry(), col = "red", add = TRUE)
+plot(distinct_route_filter_low %>% st_geometry(), col = "red", add = TRUE)
 title("Routes that Should be Evaluated for Closure")
 ```
 
