@@ -79,7 +79,11 @@ routes$Bus_Route %in% ridership$ROUTE
 #completing a join via coercion
 routes_ridership <- right_join(x = ridership, 
 <<<<<<< HEAD
+<<<<<<< HEAD
                                y = routes_worc, by = c("ROUTE" = "BusRoute")) 
+=======
+                               y = routes, by = c("ROUTE" = "BusRoute")) 
+>>>>>>> c7fe7efb0cad9bfe302fa5f24829449a3b302dbe
 =======
                                y = routes, by = c("ROUTE" = "BusRoute")) 
 >>>>>>> c7fe7efb0cad9bfe302fa5f24829449a3b302dbe
@@ -91,6 +95,10 @@ routes_ridership <- right_join(x = ridership,
 #cleaning data up
 distinct_routes <- routes_ridership %>% distinct(ROUTE, .keep_all = TRUE) 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+#%>% as.data.frame()
+>>>>>>> c7fe7efb0cad9bfe302fa5f24829449a3b302dbe
 =======
 #%>% as.data.frame()
 >>>>>>> c7fe7efb0cad9bfe302fa5f24829449a3b302dbe
@@ -98,6 +106,7 @@ distinct_routes <- routes_ridership %>% distinct(ROUTE, .keep_all = TRUE)
 #generating a new field to categorize ridership
 distinct_routes_filter$ride_cat
 distinct_routes_filter <- distinct_routes %>% 
+<<<<<<< HEAD
 <<<<<<< HEAD
   mutate(ride_cat = ifelse(WKDAY_RIDERS > 170000, "high", "other"), 
          ride_cat = ifelse(between(WKDAY_RIDERS, 10000, 170000), "medium", ride_cat),
@@ -247,6 +256,8 @@ plot(subsidy_route_filter_high %>% st_geometry(), col = "red", add = TRUE)
 title("Routes that Should be Evaluated for Closure")
 
 =======
+=======
+>>>>>>> c7fe7efb0cad9bfe302fa5f24829449a3b302dbe
   mutate(ride_cat = ifelse(WKDAY_RIDERS > 200000, "high", "other"), 
          ride_cat = ifelse(between(WKDAY_RIDERS, 100000, 199999), "medium", ride_cat),
          ride_cat = ifelse(WKDAY_RIDERS < 100000, "low", ride_cat)) %>% 
