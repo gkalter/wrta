@@ -78,7 +78,11 @@ routes$Bus_Route %in% ridership$ROUTE
 
 #completing a join via coercion
 routes_ridership <- right_join(x = ridership, 
+<<<<<<< HEAD
                                y = routes_worc, by = c("ROUTE" = "BusRoute")) 
+=======
+                               y = routes, by = c("ROUTE" = "BusRoute")) 
+>>>>>>> c7fe7efb0cad9bfe302fa5f24829449a3b302dbe
 ```
 
 ## Categories Map Mutation
@@ -86,10 +90,15 @@ routes_ridership <- right_join(x = ridership,
 ```{r, warning = FALSE, message = FALSE, error = TRUE}
 #cleaning data up
 distinct_routes <- routes_ridership %>% distinct(ROUTE, .keep_all = TRUE) 
+<<<<<<< HEAD
+=======
+#%>% as.data.frame()
+>>>>>>> c7fe7efb0cad9bfe302fa5f24829449a3b302dbe
 
 #generating a new field to categorize ridership
 distinct_routes_filter$ride_cat
 distinct_routes_filter <- distinct_routes %>% 
+<<<<<<< HEAD
   mutate(ride_cat = ifelse(WKDAY_RIDERS > 170000, "high", "other"), 
          ride_cat = ifelse(between(WKDAY_RIDERS, 10000, 170000), "medium", ride_cat),
          ride_cat = ifelse(WKDAY_RIDERS < 10000, "low", ride_cat)) %>% 
@@ -237,5 +246,59 @@ plot(headways_route_filter_high %>% st_geometry(), col = "red", add = TRUE)
 plot(subsidy_route_filter_high %>% st_geometry(), col = "red", add = TRUE)
 title("Routes that Should be Evaluated for Closure")
 
+=======
+  mutate(ride_cat = ifelse(WKDAY_RIDERS > 200000, "high", "other"), 
+         ride_cat = ifelse(between(WKDAY_RIDERS, 100000, 199999), "medium", ride_cat),
+         ride_cat = ifelse(WKDAY_RIDERS < 100000, "low", ride_cat)) %>% 
+  st_as_sf()
+# cat3 <- st_as_sf(cat2, sf_column_name = geometry)
+
+ggplot(distinct_routes_filter) + geom_sf(aes(color = ride_cat))
+
+### stopped editing here
+
+ridership %>% summarize(mean(WKDAY_RIDERS), sd(WKDAY_RIDERS)) #%>% plot()
+
+# mean yields by yield category
+districts_mu <- districts2 %>% 
+  mutate(yld_cat = ifelse(yield > 3.5, "high", "other"), 
+         yld_cat = ifelse(between(yield, 3.5, 4.5), "medium", yld_cat),
+         yld_cat = ifelse(yield < 3.5, "low", yld_cat)) %>% 
+  dplyr::select(1:5, 7) %>% 
+  group_by(yld_cat) %>% summarize(yield = mean(yield))
+
+ggplot(districts_mu) + geom_sf(aes(fill = yield))
+
+# category map
+districts2 %>% 
+  mutate(yld_cat = ifelse(yield > 3.5, "high", "other"), 
+         yld_cat = ifelse(between(yield, 3.5, 4.5), "medium", yld_cat),
+         yld_cat = ifelse(yield < 3.5, "low", yld_cat)) %>% 
+  ggplot() + geom_sf(aes(fill = yld_cat))
+
+```
+
+# Map Categorizing Routes
+```{r, eval = FALSE}
+categories <- quantile(raintot, probs = seq(0, 1, 1 / 3)) quan
+ # category map
+plot(county)
+ridership %>% 
+  mutate(WKDAY_RIDERS_cat = ifelse(WKDAY_RIDERS > 100000, "high", WKDAY_RIDERS_cat),  
+          WKDAY_RIDERS_cat = ifelse(between(WKDAY_RIDERS, 10000, 99999), "medium", WKDAY_RIDERS_cat),
+        WKDAY_RIDERS_cat = ifelse(WKDAY_RIDERS < 10000, "low", WKDAY_RIDERS_cat),
+        WKDAY_RIDERS_cat = ifelse(WKDAY_RIDERS, "No Route", WKDAY_RIDERS_cat)) %>% 
+    ggplot() + geom_sf(aes(fill = yld_cat))
+```
+
+# Map Showcasing Routes above Maximum Allowable Subsidy
+
+```{r, eval = FALSE}
+> districts2 %>% 
++   mutate(yld_cat = ifelse(yield > , "high", "other") , 
++          yld_cat = ifelse(between(yield, 3.5, 4.5), "medium", yld_cat),
++          yld_cat = ifelse(yield < 3.5, "low", yld_cat)) %>% 
++   ggplot() + geom_sf(aes(fill = yld_cat))
+>>>>>>> c7fe7efb0cad9bfe302fa5f24829449a3b302dbe
 ```
 
