@@ -21,7 +21,7 @@ might be in the city.
 
 * Many outputs have been shortened using head() in order to improve readability while
 still allowing the end user to see the outputs for themselves. A few have been left out
-for redundancies sake.
+for redundancies sake and/or where doing so didn't make sense.
 
 ## Reading in Packages and Libraries
 
