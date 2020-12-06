@@ -19,6 +19,10 @@ Garren uploaded and cleaned the code. The following vignette displays basic info
 regarding the population density and concentration of vehicles in Worcester, MA. This is important for our analysis as they are strong indicators of where potential bus riders
 might be in the city. 
 
+* Many outputs have been shortened using head() in order to improve readability while
+still allowing the end user to see the outputs for themselves. A few have been left out
+for redundancies sake.
+
 ## Reading in Packages and Libraries
 
 ```{r setup}
@@ -58,40 +62,48 @@ worcester <- system.file("extdata/Worcester/worcester.shp",
 
 ## Reprojection and Cropping
 
-```{r}
-# summary statistics and joins for setup
-#Cropping
-#reproject
-routes <- st_transform(x = routes, crs = st_crs(worcester)) # reproject to same CRS
+```{r, warning = FALSE, message = FALSE }
 
-stops <- st_transform(x = stops, crs = st_crs(worcester)) # reproject to same CRS
+#Reproject to same CRS
+routes <- st_transform(x = routes, crs = st_crs(worcester))
+head(routes)
 
-roads <- st_transform(x = roads, crs = st_crs(worcester))# reproject to same CRS
+stops <- st_transform(x = stops, crs = st_crs(worcester)) 
+head(stops)
 
-census_poly <- st_transform(x = census_poly, crs = st_crs(worcester)) # reproject to same CRS
+roads <- st_transform(x = roads, crs = st_crs(worcester))
+roads
+
+census_poly <- st_transform(x = census_poly, crs = st_crs(worcester)) 
+head(census_poly)
+
+# Cropping
 #major roads in Worcester
-roads_worc <- st_intersection(x = roads, y = worcester) #roads worcester intersect
+roads_worc <- st_intersection(x = roads, y = worcester) 
+head(roads_worc)
 #bus stops
-stops_worc <- st_intersection(x = stops, y = worcester) # stops worcester intersect
+stops_worc <- st_intersection(x = stops, y = worcester) 
+head(stops_worc)
 #bus routes
-routes_worc <- st_intersection(x = routes, y = worcester) # routes worcester intersect
+routes_worc <- st_intersection(x = routes, y = worcester)
+head (routes_worc)
 ```
 
 ## Joining and Cleaning Dataframes
 
-```{r}
+```{r,  warning = FALSE, message = FALSE}
 #join data frame by census tract id
 census_data <- left_join(census_pop, vehicle, by = "ct10_id")  #
-
+head(census_data)
 ## Polygon convert character to numeric column
 census_data_pop <- census_poly %>% mutate(ct10_id = as.numeric(ct10_id))
-
+head(census_data_pop)
 #joining new dataset
 census_data_poly <- left_join(census_data_pop, census_data, by = "ct10_id") 
-
+head(census_data_poly)
 #census worcester data 
 census_worc <- st_intersection(x = census_data_poly, y = worcester)  
-
+head(census_worc)
 #clean up population data
 pop_density <- census_worc[ , c("pop", "area_acres", "area_sqft", "ct10_id", "objectid", "shape")] 
 pop_density #pop density data worcester
@@ -107,6 +119,7 @@ vehicle_density # vehicle density data worcester
 
 ```{r}
 # adding fields regarding density
+#no output displayed
 
 #density over sq acres
 pop_density$density_acres <- (pop_density$pop/640)
@@ -124,8 +137,10 @@ vehicle_density$density_sqmile <- (vehicle_density$veh_tot/vehicle_density$area_
 ## Subsetting Data
 ```{r}
 vehicle_density_subset <- subset(vehicle_density, select = c("density_sqmile", "geometry"))  
+head(vehicle_density_subset)
 
 pop_density_subset <- subset(pop_density, select = c("density_sqmile", "geometry"))
+head(pop_density_subset)
 ```
 
 ## Calculating Mean
