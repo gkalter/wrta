@@ -28,7 +28,7 @@ library(sf)
 # Read in files
 # username fix
 ridership <- system.file("extdata/Weekday_ridership.xlsx", package = "wrta") %>% 
-  st_read() 
+  readxl::read_excel() 
 county <- system.file("extdata/tl_2017_25027_faces/tl_2017_25027_faces.shp",
                      package = "wrta") %>% st_read()
 roads <- system.file("extdata/tl_2018_25027_roads/tl_2018_25027_roads.shp",
@@ -36,81 +36,62 @@ roads <- system.file("extdata/tl_2018_25027_roads/tl_2018_25027_roads.shp",
 stops <- system.file("extdata/WRTA_August_2020/Active_WRTA_Bus_Stops_Aug2020.shp",
                      package = "wrta") %>% st_read()
 routes <- system.file("extdata/WRTA_August_2020/Active_WRTA_Routes_Aug2020.shp",
-                      package = "wrta") %>% st_read()
+                      package = "wrta") %>% st_read() %>% st_zm()
 censusTractPolygon <- system.file("extdata/tl_2018_25027_roads/tl_2018_25027_roads.shp",
                      package = "wrta") %>% st_read()
 polygonCensusTract<- system.file("extdata/Census/export-gisdata.mapc.census2010_tracts_poly.shp",
                      package = "wrta") %>% st_read()
+
 vehicle <- system.file("extdata/tabular.trans_mavc_public_summary_ct_2014_q4.csv", package = "wrta") %>% readr::read_csv(.)
+
 censusTractPop <- system.file("extdata/tabular.demo_general_demographics_ct_2010.csv", package = "wrta") %>% readr::read_csv(.)
+
+worcester <- system.file("extdata/Worcester/worcester.shp",
+                     package = "wrta") %>% st_read()
 ```
 
 ```{r, eval = FALSE}
 # summary statistics and joins for setup
-worcestercounty <- subset(county, NAME = "COUNTYFP" , drop = FALSE)
-
-censusTractDf <- left_join(censusTractPop, vehicle, by = "ct10_id") #joining data frames
-censusTractdf_2 <- polygonCensusTract %>%  
-    mutate(ct10_id = as.numeric(ct10_id)) # convert type to numeric
-censusTractDf1 <- left_join(censusTractdf_2, censusTractDf, by = "ct10_id") #joining new dataset
-popDensityTable<- censusTractDf1[ , c("pop", "area_acres", "ct10_id" )] %>% st_set_geometry(NULL)
+#Cropping
+#reproject
+routes_reprojected <- st_transform(x = routes, crs = st_crs(worcester))
+stops_reprojected  <- st_transform(x = stops, crs = st_crs(worcester))
+roads_reprojected  <- st_transform(x = roads, crs = st_crs(worcester))
+#major roads in Worcester
+roads_worc <- st_intersection(x = roads_reprojected , y = worcester) 
+#bus stops
+stops_worc <- st_intersection(x = stops_reprojected, y = worcester)
+#bus routes
+routes_worc <- st_intersection(x = routes_reprojected, y = worcester)
+censusTractDataFram1 <- left_join(censusTractPop, vehicle, by = "ct10_id") 
+st)
+censusDataVPOP <- polygonCensusTract %>%  
+    mutate(ct10_id = as.numeric(ct10_id))
+censusDataVPOPPoly <- left_join(censusDataVPOP, censusTractDataFram1, by = "ct10_id") #joining new dataset
+worcester_census <- st_intersection(x = censusDataVPOPPoly, y = worcester) 
+popDensityTable <- worcester_census[ , c("pop", "area_acres", "area_sqft", "ct10_id", "objectid", "shape")] 
 popDensityTable
-class(popDensityTable)
-lapply(popDensityTable[ ,c(1:2)], as.numeric)
-DensityOverSpaceMA <- lapply(popDensityTable, function(x) as.numeric(as.character(x)))
+vehicleDensityTable <- worcester_census[ , c("veh_tot", "area_acres", "area_sqft", "ct10_id", "objectid", "shape")] 
+vehicleDensityTable
+popDensityTable$density_acres <- (popDensityTable$pop/640) # density over acre mile
+popDensityTable$density_sqmile <- (popDensityTable$pop/vehicleDensityTable$area_sqft) # density over sq mile
+vehicleDensityTable$density_acres <- (vehicleDensityTable$veh_tot/640) # density over acre mile
+vehicleDensityTable$density_sqmile <- (vehicleDensityTable$veh_tot/vehicleDensityTable$area_sqft) # density over sq mile
+plot(vehicleDensityTable)
+plot(popDensityTable)
 
-DensityOverSpaceMA$newColumn <- (DensityOverSpaceMA$pop / DensityOverSpaceMA$area_acres) #density over acre
- names(DensityOverSpaceMA) <- c("pop", "area_acres", "ct10_id", "dAcre")
-DensityOverSpaceMA$newColumn <- (DensityOverSpaceMA$dAcre/640) # density over sq mile
- names(DensityOverSpaceMA) <- c("pop", "area_acres", "ct10_id", "dAcre", "dSqMile")
-Density <- as.data.frame(DensityOverSpaceMA)
-df3 <- polygonCensusTract %>%  
-    mutate(ct10_id = as.numeric(ct10_id))
-DensityCensusTractJoin<- left_join(Density, df3, by = "ct10_id")
-df4 <- polygonCensusTract %>%  
-    mutate(ct10_id = as.numeric(ct10_id))
-DensityCensusTractJoin<- left_join(Density, df4, by = "ct10_id")
-DensitySfObj<-st_as_sf(DensityCensusTractJoin)
-Density_plot <- ggplot(data = DensitySfObj) + geom_sf(aes(fill = dSqMile))
-Density_plot 
-v  <- 4326
-st_transformDensity <- st_transform(DensitySfObj, crs = v)
-st_county <- st_transform(county, crs = v)
-Worcester_county <- st_county %>% filter (COUNTYFP == 027)
-st_county_Density <- sf::st_intersects(st_county, st_transformDensity)
-unlisted_Dw <- unlist(st_county_Density)
-Worcester_Density_Df <-as.data.frame(unlisted_Dw)
-Worcester_Density_Censis_Tract <-suppressWarnings(plot(,  col = "blue", pch = 20, add = TRUE)) 
-```
-# join
-# I turned all 3 data frames into a list then used an lapply to merge them into a singular data frame this completed the joins
-# Join 1: Pop Census Tract to Census tract Poly on ct10_id table place
-# Join 2: Pop Census Tract to Census tract Poly on ct10_id table place
-# Joins so Roads etc to main map 
-
-
+vehicleDensityTable_subset <- subset(vehicleDensityTable, select = c("density_sqmile", "geometry"))
+popDensityTable_subset <- subset(popDensityTable, select = c("density_sqmile", "geometry"))
+mean(popDensityTable_subset$density_sqmile)
+mean(vehicleDensityTable_subset$density_sqmile)
+palletecolors <- colors()[1:3]
 ```
 
-```{r, eval = FALSE}
-# Projection and printing
-```
-
-```{r, eval = FALSE}
-# Test
-class(vehicle)
-class(censusTractPolygon)
-class(censusTractPop)
-class(censusTractList)
-class(censusTractDf1)
-class(popDensityTable)
-
-
-```
-
-```{r, eval = FALSE}
-# Figure 3
-```
-
-```{r, eval = FALSE}
-# Figure #4
+```{r, fig.width=4.75, fig.height=3.75, fig.align = "center"}
+par(mar = c(0, 0, 1, 0))
+set.seed(1)
+Population_Density <- plot(popDensityTable_subset)
+title("Density")
+Vehicle_Density <- plot(vehicleDensityTable_subset)
+title("Density")
 ```
