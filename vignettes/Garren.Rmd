@@ -1,5 +1,7 @@
 ---
-title: "Garren"
+title: "WRTA Route Characteristics and Exploratory Findings"
+author: "Garren Kalter"
+date: "December 6th, 2020"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Garren}
@@ -14,8 +16,11 @@ knitr::opts_chunk$set(
 )
 ```
 
-The following is a vignette of Garren Kalter's work for the final project. As you can see,
-the following is predominantly vector data, that has been cut to the city boundaries of Worcester, joined with relevant preprocessed data about the routes, and then displayed to highlight charateristic discrepancies between them. 
+The following is a vignette of Garren's work for the final project. As you can see below, the following is predominantly vector data that has been cut to Worcester's city boundaries, joined with relevant preprocessed data about the routes, and then displayed to highlight charateristic discrepancies between them. The last two maps indicate on aggregate which routes should be considered for additional funding and which should be considered for closure.
+
+* Many outputs have been shortened using head() in order to improve readability while
+still allowing the end user to see the outputs for themselves. A few have been left out
+for redundancies sake and/or where doing so didn't make sense.
 
 
 ## Reading in Relevant Libraries
@@ -46,36 +51,50 @@ worcester <- system.file("extdata/Worcester/worcester.shp",
                      package = "wrta") %>% st_read()
 ```
 
-## Cropping
+## Projecting and Cropping to Worcester, MA
 
 ```{r, warning = FALSE, message = FALSE}
 #reproject
 routes <- st_transform(x = routes, crs = st_crs(worcester))
+head(routes)
+
 stops <- st_transform(x = stops,crs = st_crs(worcester))
+head(stops)
+
 roads <- st_transform(x = roads, crs = st_crs(worcester))
+head(roads)
+
 #major roads in Worcester
-roads_worc <- st_intersection(x = roads, y = worcester) 
+roads_worc <- st_intersection(x = roads, y = worcester)
+head(roads_worc)
 #bus stops
 stops_worc <- st_intersection(x = stops, y = worcester)
+head(stops_worc)
 #bus routes
 routes_worc <- st_intersection(x = routes, y = worcester)
+head(routes_worc)
 ```
 
-## Join
+## Joining Preprocessed Data to Routes Shapefile
 
 ```{r, warning = FALSE, message = FALSE}
 #Identifying whether variables Match
 routes$Bus_Route %in% ridership$ROUTE
+
 #completing a join via coercion
 routes_ridership <- right_join(x = ridership, 
                                y = routes_worc, by = c("ROUTE" = "BusRoute")) 
+head(routes_ridership)
 ```
 
 ## Categories Map Mutation
 
 ```{r, warning = FALSE, message = FALSE, error = TRUE}
 #cleaning data up
+
 distinct_routes <- routes_ridership %>% distinct(ROUTE, .keep_all = TRUE) 
+head(distinct_routes)
+
 #generating a new field to categorize ridership
 distinct_routes_filter$ride_cat
 distinct_routes_filter <- distinct_routes %>% 
@@ -83,25 +102,32 @@ distinct_routes_filter <- distinct_routes %>%
          ride_cat = ifelse(between(WKDAY_RIDERS, 10000, 170000), "medium", ride_cat),
          ride_cat = ifelse(WKDAY_RIDERS < 10000, "low", ride_cat)) %>% 
   st_as_sf()
+
+head(distinct_routes_filter)
 ```
 
 ### Correcting for Overlaid Routes
 
 ```{r, warning = FALSE, message = FALSE}
 # uh oh it isn't displaying properly, let's break that up so routes other 
-##[2]than the top one shows.
+##[2]than the one overlaid on top show.
+
 distinct_route_filter_low <- subset(distinct_routes_filter, 
-                                    ride_cat == "low", select = c("geometry")) 
+                                    ride_cat == "low", select = c("geometry"))
+distinct_route_filter_low
+
 distinct_route_filter_medium <- subset(distinct_routes_filter, 
-                                       ride_cat == "medium", select = c("geometry"))
+                                     ride_cat == "medium", select = c("geometry"))
+distinct_route_filter_medium
+
 distinct_route_filter_high <- subset(distinct_routes_filter, 
                                      ride_cat == "high", select = c("geometry"))
+distinct_route_filter_high
 ```
 
 ### Plotting Categories of Ridership
 
 ```{r, fig.width=4.75, fig.height=3.75, fig.align = "center"}
-#plot
 par(mar = c(0, 0, 1, 0))
 plot(worcester %>% st_geometry(), col = "grey")
 plot(distinct_route_filter_low %>% st_geometry(), col = "red", add = TRUE)
@@ -115,29 +141,40 @@ legend(x = "bottomright", legend = c("low", "medium", "high"),
 ## Subsidies Map Mutation
 
 ```{r, warning = FALSE, message = FALSE, error = TRUE}
+#generating a new field categorizing subsidy
+
 subsidy_routes_filter$sub_cat
 subsidy_routes_filter <- distinct_routes %>% 
   mutate(sub_cat = ifelse(subsidy > 10.00, "high", "other"), 
          sub_cat = ifelse(between(subsidy, 3.00, 10.00), "medium", sub_cat),
          sub_cat = ifelse(subsidy < 3.00, "low", sub_cat)) %>% 
   st_as_sf()
+
+head(subsidy_routes_filter)
 ```
 
 ### Correcting for Overlaid Routes
 
 ```{r, warning = FALSE, message = FALSE}
+# uh oh it isn't displaying properly, let's break that up so routes other 
+##[2]than the one overlaid on top show.
+
 subsidy_route_filter_low <- subset(subsidy_routes_filter, 
-                                   sub_cat == "low", select = c("geometry")) 
+                                   sub_cat == "low", select = c("geometry"))
+subsidy_route_filter_low
+
 subsidy_route_filter_medium <- subset(subsidy_routes_filter, 
                                       sub_cat == "medium", select = c("geometry"))
+subsidy_route_filter_medium
+
 subsidy_route_filter_high <- subset(subsidy_routes_filter, 
                                     sub_cat == "high", select = c("geometry"))
+subsidy_route_filter_high
 ```
 
 ### Plotting Subsidies Map
 
 ```{r, fig.width=4.75, fig.height=3.75, fig.align = "center"}
-#plot
 par(mar = c(0, 0, 1, 0))
 plot(worcester %>% st_geometry(), col = "grey")
 plot(subsidy_route_filter_low %>% st_geometry(), col = "green", add = TRUE)
@@ -152,29 +189,44 @@ legend(x = "bottomright", legend = c("low", "medium", "high"),
 ## Headways Map Mutation
 
 ```{r, warning = FALSE, message = FALSE, error = TRUE}
+#generating a new field categories headway times. This is how often the bus goes
+#[2] by the same stop.
+
 headways_routes_filter$head_cat
 headways_routes_filter <- distinct_routes %>% 
   mutate(head_cat = ifelse(time > 60, "high", "other"), 
          head_cat = ifelse(between(time, 30, 60), "medium", head_cat),
          head_cat = ifelse(time < 30, "low", head_cat)) %>% 
   st_as_sf()
+
+head(headways_routes_filter)
 ```
 
 ### Correcting for Overlaid Routes
 
+As you can see below there are no routes which run below 30 minutes, this is a problem when trying to run an efficient bus system that is convenient for riders. As articulated, for example, in the Downs Thomson paradox car traffic will continue to worsen until there are other comparable modes of alternative transit to get where you want to go. Therefore, if I at best can pick up a route every thirty minutes and at worst every two hours, if I have the means, I'm going to take a car to get where I need to go on time. 
+
 ```{r, warning = FALSE, message = FALSE}
+# uh oh it isn't displaying properly, let's break that up so routes other 
+##[2]than the one overlaid on top show.
+
+
 headways_route_filter_low <- subset(headways_routes_filter, 
-                                    head_cat == "low", select = c("geometry")) 
+                                    head_cat == "low", select = c("geometry"))
+headways_route_filter_low
+
 headways_route_filter_medium <- subset(headways_routes_filter, 
                                        head_cat == "medium", select = c("geometry"))
+headways_route_filter_medium
+
 headways_route_filter_high <- subset(headways_routes_filter, 
                                      head_cat == "high", select = c("geometry"))
+headways_route_filter_high
 ```
 
 ### Plotting Headways Map
 ```{r, fig.width=4.75, fig.height=3.75, fig.align = "center"}
-# as you can see there are no routes which run below 30 minutes, this is a problem
-# when trying to run an efficient WRTA
+
 par(mar = c(0, 0, 1, 0))
 plot(worcester %>% st_geometry(), col = "grey")
 plot(headways_route_filter_low %>% st_geometry(), col = "green", add = TRUE)
@@ -186,14 +238,17 @@ legend(x = "bottomright", legend = c("low", "medium", "high"),
 ```
 
 ## Candidates for Bus Rapid Transit
+
+While perhaps simplistic or brute this map, displays the best candidates for 
+increased investment. Most modern systems have bus rapid transit (BRT) lines, which
+run frequently enough that an end user shouldn't have to worry about 
+timetables.Basic geostatistic analysis in my other class indicates 
+upwards of 13,000 bus rider candidates who would benefit from a BRT line 
+on the 27 alone with 48,000 residents in walking distance. Future
+iterations of this analysis will hopeful indicate the same thing.
+
 ```{r, fig.width=4.75, fig.height=3.75, fig.align = "center"}
-# While perhaps simplistic or brute this map, displays the best candidates for 
-# [2] increased investment. Most modern bus ways have rapid transit line, which
-# [3] run frequently enough that an end user shouldn't have to worry about 
-# [4] timetables.Basic geostatistic analysis in my other class indicates 
-# [5] upwards of 13,000 bus rider candidates who would benefit from a BRT line 
-# [6] on the 27 alone with 48,000 residents in walking distance.Future
-# [7] iterations of this analysis will hopeful indicate the same thing.
+
 par(mar = c(0, 0, 1, 0))
 plot(worcester %>% st_geometry(), col = "grey")
 plot(subsidy_route_filter_low %>% st_geometry(), col = "green", add = TRUE)
@@ -202,16 +257,19 @@ title("Routes that are Good Candidates for BRT")
 ```
 
 
-Candidates for Removal
+## Candidates for Removal
+
+The routes above could be subsidized by removing the following routes which have
+extremely high subsidy, over three times the system average, and low ridership.
+The top three worst routes are routes 8, 22, and 29.
 
 ```{r, fig.width=4.75, fig.height=3.75, fig.align = "center"}
-# The routes above could be subsidized by removing the following routes which have
-# [2] extremely high subsidy, over three times the system average, and low ridership. 
+
 par(mar = c(0, 0, 1, 0))
 plot(worcester %>% st_geometry(), col = "grey")
 plot(headways_route_filter_high %>% st_geometry(), col = "red", add = TRUE)
 plot(subsidy_route_filter_high %>% st_geometry(), col = "red", add = TRUE)
 plot(distinct_route_filter_low %>% st_geometry(), col = "red", add = TRUE)
-title("Routes that Should be Evaluated for Closure")
+title("Candidates for Route Removal")
 ```
 
