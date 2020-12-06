@@ -82,7 +82,7 @@ Similar to population density, vehicle ownership is an important factor to consi
 when planning a bus system.  70% of WRTA riders don't own a car! In Garren's other GIS
 class, a basic suitability index (income, population, and car ownership), revealed that there were 13,000 "missing bus riders" along route 27, which only gets 1,000 riders a day.
 
-```{r, fig.align ='center', out.width = "70%"}
+```{r, fig.align ='center', out.width = "50%"}
 
 knitr::include_graphics("figures/vehicledense.png")
 ```
@@ -123,7 +123,7 @@ knitr::include_graphics("figures/frequency.png")
 
 
 ## Results - Bus Rapid Transit
-Routes 27, 26, and 19 among them are good candidates for increased funding.
+Routes 27, 26, and 19 are good candidates for increased funding.
 
 ```{r, fig.align ='center', out.width = "70%"}
 
