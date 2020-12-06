@@ -51,84 +51,98 @@ worcester <- system.file("extdata/Worcester/worcester.shp",
 ```
 
 
-```{r, echo = FALSE}
-library(rasterVis)
-
-png("inst/external/figs/Subsidy.png", bg = "transparent", height = 4, 
-    width = 3, res = 300, units = "in")
-dev.off
-
-```
-
-
 ## Methods
 
-Our methodology is fairly straight forward. We have five deliverables, designed as 
+Our methodology is fairly straight forward. We have six deliverables, designed as 
 as follows:
 
 - Population Density Map (Read in data --> Display)
+- Car Ownership Rate (Read in data --> Display)
 - Categorization of Ridership Map (Preprocess --> Read In --> Join with Line Data --> Create categories --> Display)
 - Routes above maximum subsidy (Preprocess --> Read In --> Join with Line Data --> Create Categories --> Display)
 - Route Headway (Preprocess --> Read In --> Join with Line Data --> Create Categories --> Display)
 - BRT- Display lowest subsidy and highest ridership routes
 - Closure- Display highest subsidy, lowest ridership, and longest time taken
 
-We found that there are many inefficiencies in the WRTA as displayed below:
+## Results - Population Density
+When making assessments and configuring bus routes population density is a critical 
+portion of the analyis. Prioritizing areas that have heavy populations, means better
+service for more people. 
+
+```{r, fig.align ='center', out.width = "60%" }
+
+knitr::include_graphics("figures/popdense.png")
+
+```
+
+
+## Results- Vehicle Density
+
+Similar to population density, vehicle ownership is an important factor to consider
+when planning a bus system.  70% of WRTA riders don't own a car! In Garren's other GIS
+class, a basic suitability index (income, population, and car ownership), revealed that there were 13,000 "missing bus riders" along route 27, which only gets 1,000 riders a day.
+
+```{r, fig.align ='center', out.width = "70%"}
+
+knitr::include_graphics("figures/vehicledense.png")
+```
 
 ## Results - Ridership
+This map showcases ridership. While the categories are somewhat arbitrary, we
+tried to simulate a natural Jenks break in the data. So low riderhip is below 10k
+weekday riders per annum, medium ridership is between 10k and 170k riders per annum,
+and high ridership is anything above 170k riders per annum.
 
-
-```{r, fig.align= 'center', fig.width=4.75, fig.height=3.75, }
+```{r, fig.align= 'center', out.width = "55%"}
 
 knitr::include_graphics("figures/Ridership.png")
 
 ```
 
 ## Results - Subsidy
+This map showcases subsidy. While there was a lot of literature on this, nothing
+quite worked with Worcester. So this map displays subsidy above and below the system average
+of 3 dollars, and had a high category for outliers above ten dollars. Folks who take the Park 
+Avenue Connector may be paying a buck seventy five, but it costs a whopping 28 dollars
+per person!
 
-```{r, fig.align ='center'}
+```{r, fig.align ='center', out.width = "55%" }
 knitr::include_graphics("figures/subsidy.png")
 
 ```
 
 ## Results - Frequency
+This map showcases frequency of service. No bus comes by less than every half hour, 
+most come between every half hour and hour, and a few come by every TWO HOURS. Imagine
+planning your day around that!
 
-```{r, fig.align ='center'}
+```{r, fig.align ='center', out.width = "60%"}
 
 knitr::include_graphics("figures/frequency.png")
 ```
 
-## Resullts Cont.
-By assessing traffic count, where ridership is already high, and where there are 
-dense populations in Worcester one can come to make recommendations.
 
+## Results - Bus Rapid Transit
+Routes 27, 26, and 19 among them are good candidates for increased funding.
 
-```{r}
-
-```
-
-## Results - BRT
-```{r, fig.align ='center'}
+```{r, fig.align ='center', out.width = "70%"}
 
 knitr::include_graphics("figures/brt.png")
 
 ```
 
 ## Results - Closure
-```{r, fig.align ='center'}
+
+Accoriding to our analysis, these routes should bec considered for closure. The top three
+are routes 8, 29 and 22.
+```{r, fig.align ='center', out.width = "70%" }
+
 
 knitr::include_graphics("figures/closure.png")
 
 ```
 
-## Results- Vehicle Density
-
-```{r, fig.align ='center'}
-
-knitr::include_graphics("figures/popdense.png")
-```
-
-## Conclusion
+## Looking Forward
 
 By looking at the above data we recommend cutting the ___ lines and adding those resources to the ____lines. In doing so, the system better serves the Worcester populace. 
 
