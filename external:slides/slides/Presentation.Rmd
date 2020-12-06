@@ -2,13 +2,12 @@
 title: "Visions of a Better WRTA"
 author: "Garren Kalter and Luke Watson Sharer"
 date: "12/4/2020"
-output:
-  ioslides_presentation: default
-  slidy_presentation: default
+output: ioslides_presentation
+ 
 ---
 
 
-```{r}
+```{r setup,include = FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
@@ -32,6 +31,7 @@ library(geospaar)
 library(sf)
 library(wrta)
 
+head(ridership)
 
 png("inst/external/figs/Subsidy.png")
 
@@ -76,9 +76,11 @@ deliverables. The methodology deployed is as follows:
 
 ## Results
 
-We found that there are many routes which are highly inefficient in Worcester as displayed below:
+We found that there are many inefficiencies in the WRTA as displayed below:
 
 ```{r}
+
+knitr::include_graphics("figures/Subsidy.png")
 
 
 
