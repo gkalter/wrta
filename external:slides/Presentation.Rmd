@@ -63,26 +63,39 @@ dev.off
 
 ## Methods
 
-Our methodology is fairly straight forward. We have six deliverables, designed as 
+Our methodology is fairly straight forward. We have five deliverables, designed as 
 as follows:
 
 - Population Density Map (Read in data --> Display)
-- Traffic Count Map (Read in --> Display)
 - Categorization of Ridership Map (Preprocess --> Read In --> Join with Line Data --> Create categories --> Display)
 - Routes above maximum subsidy (Preprocess --> Read In --> Join with Line Data --> Create Categories --> Display)
 - Route Headway (Preprocess --> Read In --> Join with Line Data --> Create Categories --> Display)
 - BRT- Display lowest subsidy and highest ridership routes
 - Closure- Display highest subsidy, lowest ridership, and longest time taken
 
-
-## Results
-
 We found that there are many inefficiencies in the WRTA as displayed below:
 
-```{r, fig.align='left'}
+## Results - Ridership
+
+
+```{r, fig.align= 'center', fig.width=4.75, fig.height=3.75, }
 
 knitr::include_graphics("figures/Ridership.png")
 
+```
+
+## Results - Subsidy
+
+```{r, fig.align ='center'}
+knitr::include_graphics("figures/subsidy.png")
+
+```
+
+## Results - Frequency
+
+```{r, fig.align ='center'}
+
+knitr::include_graphics("figures/frequency.png")
 ```
 
 ## Resullts Cont.
@@ -92,6 +105,27 @@ dense populations in Worcester one can come to make recommendations.
 
 ```{r}
 
+```
+
+## Results - BRT
+```{r, fig.align ='center'}
+
+knitr::include_graphics("figures/brt.png")
+
+```
+
+## Results - Closure
+```{r, fig.align ='center'}
+
+knitr::include_graphics("figures/closure.png")
+
+```
+
+## Results- Vehicle Density
+
+```{r, fig.align ='center'}
+
+knitr::include_graphics("figures/popdense.png")
 ```
 
 ## Conclusion
