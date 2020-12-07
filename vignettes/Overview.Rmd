@@ -105,9 +105,9 @@ We felt it important to highlight the preprocessed data we gathered from the Reg
 ridership
 ```
 
-## Vehcile Density Map
+## Vehicle Density Map
 
-The below map is a vehicle density map, which showcases and categories the total inventory of vehicles per census tract. This is particularly important as approximately 70% of WRTA users do not own a car. Given that census tracts are fairly small, and the scale of analysis is per sq mile, the  vehicular density is fairly low. However, one can clearly discern that areas that are more populated appear to have a higher density of vehicles.
+The below map is a vehicle density map, which showcases and categorizes the total inventory of vehicles per census tract. This is particularly important as approximately 70% of WRTA users do not own a car. Given that census tracts are fairly small, and the scale of analysis is per sq mile, the  vehicular density is also fairly low. However, one can clearly discern that areas that are more populated appear to have a higher density of vehicles.
 
 ```{r, out.width = "70%", fig.align = 'center', echo = FALSE}
 knitr::include_graphics("figures/vehicle_dense.png")
@@ -115,7 +115,7 @@ knitr::include_graphics("figures/vehicle_dense.png")
 
 ## Subsidy Map
 
-The below map is the subsidies map. While all routes recieve subsidy the range is fairly broad, anywhere from two dollars per rider to 26 dollars per rider. While, there is a correlation between high ridership and low subsidy levels this relationship does not always hold up. By identifying routes that for one reason or another require additional subsidy compared to others we can begin to implement strategic budgetary improvements for the system and send dollars where additional riders are.  For example, route 29 has moderate levels of ridership around 55,000 people, but has a subsidy of 19 dollars per person. 
+The below map is the subsidies map. While all routes recieve subsidy the range is fairly broad, anywhere from two dollars per rider to 26 dollars per rider. The color scheme of the map below is categorized as follows. A low rate shows fares below the system average of three dollars, medium is above average, and a high categorization is 10 dollars per rider. Additionally, while, there is a correlation between high ridership and low subsidy levels this relationship does not always hold up. By identifying routes that for one reason or another require additional subsidy compared to others we can begin to implement strategic budgetary improvements for the system and send dollars where additional riders are.  For example, route 29 has moderate levels of ridership around 55,000 people, but has a subsidy of 19 dollars per person. 
 
 
 
@@ -125,7 +125,7 @@ knitr::include_graphics("figures/subs_final.png")
 
 ## Frequency Map
 
-The frequency map, highlights some of the more absurd components of the WRTA system. While there is no route that runs more often than every half hour, there are multiple routes which run every two hours. With on time rates between 80 and 90% further analysis of these infrequent routes is warranted. For example, many of these routes go to and from Worcester's suburbs. Per a phone interview with operators in the WRTA, these suburban routes are the only ones with peak ridership for commuting with 40% of WRTA ridership currently uses the system for commuting. These routes seems like an optimal growth scenario, as it is reasonable to assume few people are voluntarily tying their timeliness to work on routes that if they miss them, will make them 2 hours late. 
+The frequency map, highlights some of the more absurd components of the WRTA system. While there is no route that runs more often than every half hour, there are multiple routes which run every two hours. With on time rates between 80 and 90% further analysis of these infrequent routes is warranted. For example, many of these routes go to and from Worcester's suburbs. Per a phone interview with operators in the WRTA, these suburban routes are the only ones with peak ridership for commuting with 40% of WRTA ridership currently uses the system for commuting. These routes seems like an optimal growth scenario, as it is reasonable to assume few people are voluntarily tying their timeliness to work on routes that, if they miss the bus, will make them 2 hours late. 
 
 ```{r, out.width = "70%", fig.align = 'center', echo = FALSE}
 knitr::include_graphics("figures/frequency_cat.png")
@@ -154,7 +154,7 @@ knitr::include_graphics("figures/vehicle_dense.png")
 
 ## Subsidy Map
 
-The below map is the subsidies map. This shows us the amount that is spent by the public in order to subsidize riding the system. We became curious about this after discovering that only about 1 in 5 operating dollars of the WRTA are made through fares and 5% of the budget is spent on fare infrastructure maintenance. Thus, fares only net about 15% of the budget. The color scheme of the map below is categorized as follows. A low rate shows fares below the system average of three dollars, medium is above average, and a high categorization is 10 dollars per rider. While there aren't too many routes with subsidies that high, the routes that do appear to be significantly more expensive to operate than they are worth. For every person that takes the 8, for example, costs the public 26 dollars. Devoting an entire bus to this line, when very few are taking it, and it has high overhead leads us to suggest a reallocation of  the 8's resources.
+The below map is the subsidies map. This shows us the amount that is spent by the public in order to subsidize riding the system. We became curious about this after discovering that only about 1 in 5 operating dollars of the WRTA are made through fares and 5% of the budget is spent on fare infrastructure maintenance. Thus, fares only net about 15% of the budget.  While there aren't too many routes with high subsidies, the routes that do, appear to be significantly more expensive to operate than they are worth. Every person that takes the 8, for example, costs the public 26 dollars. Devoting an entire bus to this line, when very few are taking it, and it has high overhead leads us to suggest a reallocation of the 8's resources.
 
 ```{r, out.width = "70%", fig.align = 'center', echo = FALSE}
 knitr::include_graphics("figures/subs_final.png")
@@ -162,7 +162,7 @@ knitr::include_graphics("figures/subs_final.png")
 
 ## Frequency Map
 
-Continuing on that, we found that even the best lines don't run all that often, with no routes running more frequently than every half hour. This supports the idea that there is a large segment of the residential population who would benefit from increased service. According to the literature, people will take whichever means of transportation gets them to their destination quickest.  By having slow transit as the standard, most people will simply never take the WRTA unless they either have no choice in the manner or they are choicing consciously to take transportation.
+Continuing on that, we found that even the best lines don't run all that often, with no routes running more frequently than every half hour. This supports the idea that there is a large segment of the residential population who would benefit from increased service. According to the literature, people will take whichever means of transportation gets them to their destination quickest.  By having slow transit as the standard, most people will simply never take the WRTA unless they either have no choice in the manner or they are choicing consciously to take pub lic transportation.
 
 ```{r, out.width = "70%", fig.align = 'center', echo = FALSE}
 knitr::include_graphics("figures/frequency_cat.png")
@@ -170,7 +170,7 @@ knitr::include_graphics("figures/frequency_cat.png")
 
 ## Bus Rapid Transit Map
 
-A continuation of this idea is installing a bus rapid transit system where demand is highest. Ideally the bus would come every 7 to 15 minutes or in otherwords frequently enough that in general a timetable is unessecary.  While our model for this is still pretty rudimentary, the below picture is the amolgomation of our other results and is our suggestion for which routes would make good candidates for this additional resourcing. We found that the top three routes were the 27, 26, and 19. Which is inline with previous recommendations for bus rapid transit in the Worcester area. 
+A continuation of this idea of fast routes is installing a bus rapid transit system where demand is highest. Ideally the bus would come every 7 to 15 minutes or in otherwords frequently enough that in general a timetable is unnessecary.  While our model for this is still pretty rudimentary, the below picture is the amolgomation of our other results and is our suggestion for which routes would make good candidates for this additional resourcing. As mentioned above, we found that the top three routes were the 27, 26, and 19. Which is inline with previous recommendations for bus rapid transit in the Worcester area. 
 
 ```{r, out.width = "70%", fig.align = 'center', echo = FALSE}
 knitr::include_graphics("figures/brt_final.png")
@@ -179,6 +179,6 @@ knitr::include_graphics("figures/brt_final.png")
 
 
 ## Looking Forward
-There are many promising opportunities looking forwards. We have identified some promising packages that we hope to use to start creating optimization models.  While we clearly had some struggles, for example with joining our information to datasets and maintaining its geometry, we are very excited to see where it goes. Additionally, Garren is spending this winter going back to the drawing board, hopefully getting input from new fields like operations research, and working to make this model comprehensive and usable to better aid the city of Worcester. We can't wait to show you in the Spring! 
+There are many promising opportunities looking forwards. We have identified some promising packages that we hope to use to start creating optimization models.  While we clearly had some struggles, for example joining our information to datasets and maintaining its geometry, we are very excited to see where it goes. Additionally, Garren is spending this winter going back to the drawing board, hopefully getting input from new data science fields like operations research, and working to make this model comprehensive and usable to better aid the city of Worcester. We can't wait to show you in the Spring! 
 
 
