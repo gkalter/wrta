@@ -17,9 +17,8 @@ knitr::opts_chunk$set(
 ```
 
 The following vignette is Luke's code for the project. Due to a Github complication,
-Garren uploaded and cleaned the code. The following vignette displays basic information
-regarding the population density and concentration of vehicles in Worcester, MA. This is important for our analysis as they are strong indicators of where potential bus riders
-might be in the city. 
+Garren uploaded and cleaned the code. The precleaned version can be accessed on Luke's branch. The following vignette displays basic information regarding the population density and concentration of vehicles in Worcester, MA. This is important for our analysis as they are strong indicators of where potential bus riders
+might be in the city and whether or not they are prioritized.
 
 * Many outputs have been shortened using head() in order to improve readability while
 still allowing the end user to see the outputs for themselves. A few have been left out

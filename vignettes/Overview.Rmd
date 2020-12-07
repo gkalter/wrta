@@ -16,23 +16,120 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(wrta)
+library(sf)
+library(dplyr)
+library(rgdal)
+library(geospaar)
 ```
 
-# Summary
+# Overview
 
-This project written by Garren Kalter and Luke Watson-Sharer attempts to showcase the inefficiencies of the Worcester Regional Transit Authority. In doing so, we hope to use our geospatial and coding skill sets in order to display potential improvements to the WRTA. While this package will continue to be built well into the Spring of 2021, for the purposes of Geography 346 we will display various deliverables with an end goal of highlighting the ideal high frequency transit lines within the city. In creating a high frequency transit network in Worcester we hope to have a proof of concept that can be applied to more complex models as Garren progresses on his thesis. 
+This project written by Garren Kalter and Luke Watson-Sharer showcases some of the inefficiencies in the Worcester Regional Transit Authority. In doing so, we hope to use our geospatial and coding skills in order to propose potential improvements to the WRTA. While this package will continue to be built well into the Spring of 2021, for the purposes of Geography 346 we will display various deliverables with an end goal of highlighting routes that are good candidates for increased service and those that could benefit from closure. 
 
 
 # Approach and Methods
 
 ## Data
 
-The data used in this report come from a variety of locations. Data sources of note include the Worcester Regional Transit Authority website, and the census. It should be known that data from the WRTA website has been manipulated and preprocessed in order to be readible for the R program. For example, there is a route profile that displays ridership data and other pertinent information on a route by route basis. This would not be useable in an R file without the appropriate information being placed in a table.
+The data used in this report come from a variety of locations. Data sources of note include the Worcester Regional Transit Authority, the census, and MassGIS. It should be known that data from the WRTA website has been manipulated and preprocessed in order to be readible for the R program. Relevant data sources are shown below, read in. 
+
+```{r}
+
+
+ridership <- system.file("extdata/Weekday_ridership.xlsx", package = "wrta") %>% 
+  readxl::read_excel() 
+
+county <- system.file("extdata/tl_2017_25027_faces/tl_2017_25027_faces.shp",
+                     package = "wrta") %>% st_read()
+
+roads <- system.file("extdata/tl_2018_25027_roads/tl_2018_25027_roads.shp",
+                     package = "wrta") %>% st_read()
+
+stops <- system.file("extdata/WRTA_August_2020/Active_WRTA_Bus_Stops_Aug2020.shp",
+                     package = "wrta") %>% st_read()
+routes <- system.file("extdata/WRTA_August_2020/Active_WRTA_Routes_Aug2020.shp",
+                      package = "wrta") %>% st_read() %>% st_zm()
+worcester <- system.file("extdata/Worcester/worcester.shp",
+                     package = "wrta") %>% st_read()
+census_poly<- system.file("extdata/Census/export-gisdata.mapc.census2010_tracts_poly.shp",          
+                          package = "wrta") %>% st_read()
+
+vehicle <- system.file("extdata/tabular.trans_mavc_public_summary_ct_2014_q4.csv", 
+                       package = "wrta") %>% readr::read_csv(.)
+
+census_pop <- system.file("extdata/tabular.demo_general_demographics_ct_2010.csv",
+                          package = "wrta") %>% readr::read_csv(.)
+
+worcester <- system.file("extdata/Worcester/worcester.shp",
+                     package = "wrta") %>% st_read()
+
+```
+
 
 ## Code
-At this point in time, we do not have any deliverables which will require a package outside of those we have already been exposed to in Geog346. Packages which will be used include: devtools, geospaar, dplyr, ggplot,roxgen2, sp, sf, tibble, and tidyverse among others. If the opportunity presents itself we would like to have a deliverable which uses the zoo package or another package which can be used to complete optimization modeling. However, this likely will not be done until the winter.
+At this point in time, we do not have any deliverables which will require a package outside of those we have already been exposed to in Geog346. Packages which will be used include: devtools, geospaar, dplyr, ggplot,roxgen2, sp, sf, tibble, and tidyverse among others. Future packages will include complex modeling and deliverables using packages like zoo or lpSolve package. However, this likely will not be done until the winter.
+
+## Methods
+
+We broke this project in to two components. Assessing the relevant background information of the WRTA and an assesstment of the characteristics of WRTA routes.
+
+### Demographic Information
+
+Here we wanted to understand the density of cars and people in Worcester. In other bus systems, such as Madison, WI indexes based off income, density, and car ownership, have been deployed successfully in order to assess route need. While, we have yet to reach indexing, we were able to create a display of population and vehicular density. We read the relevant data in from the census, reprojected it, and cleaned it in order to cut it to Worcester. Finally we added relevant fields and plotted it. Additional information can be found on the Luke Vignette.
 
 
-## Timeline
-Due to the various hurdles that come with the end of the semester as well as the abrupt transition last week little progress has been made at this point in time. However, by the end of the day today, Wednesday the 25th the following objectives should be achieved: finish configuring the WRTA package, first draft of the Overview pushed, the skeleton of our presentation being pushed, read in of various key files, and the launch of preliminary maps. Amendments for future components of our timeline will be pushed likely by this evening. 
+### Characteristics of Bus Routes
+
+Here we created deliverables for three different characteristics: the amount of riders on a route (ridership), how often the route comes by (frequency), and how much the route is subsidized by the government(subsidy). 
+
+The methodology in these maps was basically identical. We preproccessed data from the 2015 
+Regional Transit Plan to determine the aforementioned characteristic values for each route. We then joined this data to a shapefile of WRTA routes and cut out routes that didn't have data or were outside Worcester. We then created a mutation that categorized these characteristics as either  high, medium, or low.  But due to routes running on the same roads only the top route would display in the map. In order to overcome this, we made new objects using subset() in order to seperate ridership, subsidy, and frequency by category.
+We then plotted these subsetted values. More information, such as specific category breakdown, can be found in the Garren vignette.
+
+## Findings
+
+We also created deliverables suggesting where additional resources would be useful. The methodology deployed was pretty brute. We simply put the worst and best categories on maps, comparing the trends against the basic demograhic maps. We recognize that future versions of this package and its subsequent modeling will require more sophisticated methodologies. 
+
+
+# Results -Worked Example
+
+The following section goes into detail about some of our outputs and what those results mean for our analysis. 
+
+While not ours, we felt it important to highlight the preprocessed data we gathered from the Regional Transit Plan. These findings are the base of our model and highlight pretty startling discrepancies in use across the system.
+
+```{r}
+ridership
+```
+
+
+The below map is a vehicle density map, which showcases and categories the total inventory of vehicles per census tract. This is particurly important as approximately 70% of WRTA users do not own a car. Thus, high levels of vehicular ownership could potentially correspond to low levels of ridership.  An overarching component of Garren's thesis involves the idea of "missing riders", or riders who are otherwise good candidates for the WRTA but choose not to take it anyway. A prime example  of this from Garren's project in Advanced Vector, is that 14,000 people without cars live within a 15 minutes walk of Route 27, the city's "best route" yet only 1 to 2 thousand people take it every day. Thus suggesting that service is not good enough and potentially tens of thousands of residents are experiencing limited mobility scenarios.
+
+```{r, out.width = "70%", fig.align = 'center', echo = FALSE}
+knitr::include_graphics("figures/vehicle_dense.png")
+```
+
+The below map is the 
+
+```{r, out.width = "70%", fig.align = 'center', echo = FALSE}
+knitr::include_graphics("figures/subs_final.png")
+```
+
+
+```{r, out.width = "70%", fig.align = 'center', echo = FALSE}
+knitr::include_graphics("figures/frequency_cat.png")
+```
+
+
+```{r, out.width = "70%", fig.align = 'center', echo = FALSE}
+knitr::include_graphics("figures/brt_final.png")
+```
+
+# Discussion 
+
+Overall our results weren't all too shocking. We found that, in general, the routes in the densest parts of town, that ran most often had the highest ridership and lowest subsidy. This finding, along with our finding that
+
+
+## Looking Forward
+There are many promising opportunities looking forwards. We have identified some promising packages that we hope to use to start creating optimization models. We also plan to meet with Professor Gentry, an operations researcher who presented
+
 
