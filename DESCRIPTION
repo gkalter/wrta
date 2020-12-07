@@ -1,13 +1,21 @@
 Package: wrta
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Visions of a Better WRTA
+Version: 0.1.0
 Authors@R: 
-    person(given = "First",
-           family = "Last",
-           role = c("aut", "cre"),
-           email = "first.last@example.com",
+    person(given = "Garren",
+           family = "Kalter",
+           role = c("cre"),
+           email = "GKalter@clarku.edu",
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+    person(given = "Luke",
+           family = "Watson-Sharer",
+           role = c("cre"),
+           email = "LWatsonSharer@clarku.edu",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: This packages is a compilations of recommendations for the improvement of 
+the Worcester Regional Transit Authority. At the moment, the analysis is pretty rudimentary 
+but additional modeling and findings will continue to be pushed as new information comes
+to light. 
 License: `use_mit_license()`, `use_gpl3_license()` or friends to
     pick a license
 Encoding: UTF-8
