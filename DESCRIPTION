@@ -13,9 +13,9 @@ Authors@R:
            email = "LWatsonSharer@clarku.edu",
            comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: This packages is a compilations of recommendations for the improvement of 
-the Worcester Regional Transit Authority. At the moment, the analysis is pretty rudimentary 
-but additional modeling and findings will continue to be pushed as new information comes
-to light. 
+    the Worcester Regional Transit Authority. At the moment, the analysis is pretty rudimentary 
+    but additional modeling and findings will continue to be pushed as new information comes
+    to light. 
 License: `use_mit_license()`, `use_gpl3_license()` or friends to
     pick a license
 Encoding: UTF-8
